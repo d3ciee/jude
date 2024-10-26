@@ -3,20 +3,12 @@
     import { Separator } from "$lib/ui/select";
     import SidebarNav from "./sidebar-nav.svelte";
     import PanelLeftClose from "lucide-svelte/icons/panel-left-close";
-    import PanelRightClose from "lucide-svelte/icons/panel-right-close";
 
-    import { Command, MailCheckIcon } from "lucide-svelte";
+    import { FileText, MailCheckIcon } from "lucide-svelte";
 
     import ChevronsUpDown from "lucide-svelte/icons/chevrons-up-down";
 
-    import {
-        Book,
-        Contact,
-        Gauge,
-        Search,
-        Plus,
-        AlignJustify,
-    } from "lucide-svelte";
+    import { Gauge, Plus } from "lucide-svelte";
 
     import * as DropdownMenu from "$lib/ui/dropdown-menu";
     import { Button } from "$lib/ui/button";
@@ -24,6 +16,8 @@
     import { Input } from "$lib/ui/input";
     import Inbox from "lucide-svelte/icons/inbox";
     import ChartBar from "lucide-svelte/icons/chart-bar";
+    import PenTool from "lucide-svelte/icons/pen-tool";
+    import PenLine from "lucide-svelte/icons/pen-line";
 
     let accounts = [
         {
@@ -147,21 +141,18 @@
         routes={[
             {
                 title: "Overview",
-                label: "128",
                 icon: Gauge,
-                path: "/",
+                path: "/overview",
             },
             {
                 title: "Rules",
-                label: "9",
-                icon: AlignJustify,
-                path: "/inbox",
+                icon: PenLine,
+                path: "/rules",
             },
             {
-                title: "Analytics",
-                label: "",
-                icon: ChartBar,
-                path: "/analytics",
+                title: "Claims",
+                icon: FileText,
+                path: "/claims",
             },
         ]}
     />

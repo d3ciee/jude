@@ -3,12 +3,11 @@
     import { cn } from "$lib/ui/utils";
     import * as Tooltip from "$lib/ui/tooltip";
 
-    //import { page } from "$app/stores";
+    import { page } from "$app/stores";
 
-    export let isCollapsed: boolean;
-    export let routes;
+    const { isCollapsed, routes }: any = $props();
 
-    $: selected = "";
+    let selected = $derived($page.url.pathname);
 </script>
 
 <div data-collapsed={isCollapsed} class="group flex flex-col gap-4">
@@ -55,7 +54,7 @@
             {:else}
                 <Button
                     href={route.path}
-                    variant={route.path === selected ? "default" : "ghost"}
+                    variant={route.path === selected ? "secondary" : "ghost"}
                     size="sm"
                     class={cn("justify-start p-2", {
                         "dark:bg-muted dark:hover:bg-muted dark:text-white dark:hover:text-white":
