@@ -90,6 +90,7 @@
                             <Table.Head>ID</Table.Head>
                             <Table.Head>Name</Table.Head>
                             <Table.Head>Status</Table.Head>
+                            <Table.Head>Created by</Table.Head>
                             <Table.Head>Created at</Table.Head>
                             <Table.Head>
                                 <span class="sr-only">Actions</span>

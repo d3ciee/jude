@@ -3,8 +3,7 @@ import init from "./lib/infra/db";
 import RulesService from "$lib/services/rules";
 import { createLogger, format, transports } from "winston";
 
-
-const hook: Handle = ({ event, resolve }) => {
+export const handle: Handle = async ({ event, resolve }) => {
     const db = init();
     const logger = createLogger({
         level: 'info',
@@ -21,10 +20,8 @@ const hook: Handle = ({ event, resolve }) => {
     event.locals.db = db;
     event.locals.logger = logger;
     event.locals.services = {
-        rules: new RulesService(db, logger)
+        rules: new RulesService(db, logger),
     }
 
-    return resolve(event);
+    return await resolve(event);
 }
-
-export default hook;

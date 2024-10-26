@@ -16,6 +16,7 @@
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
+		"@types/bcryptjs": "^2.4.6",
 		"@types/better-sqlite3": "^7.6.11",
 		"autoprefixer": "^10.4.20",
 		"bits-ui": "^0.21.16",
@@ -37,6 +38,7 @@
 		"zod": "^3.23.8"
 	},
 	"dependencies": {
+		"@ai-sdk/google": "^0.0.54",
 		"@libsql/client": "^0.14.0",
 		"bcryptjs": "^2.4.3",
 		"better-sqlite3": "^11.5.0",

@@ -1,8 +1,7 @@
-import type { PageServerLoad } from './$types';
-
-export const load = (async () => {
+export const load = (async (e) => {
+    //const rules = await e.locals.services.rules.getAllRules();
     return {};
-}) satisfies PageServerLoad;
+});
 
 export const actions = {
     create: async ({ request }) => {

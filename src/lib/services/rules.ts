@@ -14,13 +14,14 @@ class RulesService {
 
     async getAllRules() {
         this.logger.info("getting rules from db")
-        return this.db.query.Rules.findMany({ with: { user: true } })
+        return this.db.query.Rules.findMany();
     }
 
     async createRule(data: { name: string, description: string, userId: string }) {
         this.logger.info("creating rule", data)
         return this.db.insert(Rules).values({
             active: true,
+            name: data.name,
             createdAt: Date.now(),
             createdBy: data.userId,
             description: data.description,
