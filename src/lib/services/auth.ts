@@ -57,8 +57,8 @@ class AuthService {
                 this.db.insert(Session).values({
                     id: sessionId,
                     userId,
-                    createdAt: new Date(),
-                    expiresAt: new Date(Date.now() + AuthService.SESSION_EXPIRES_IN_MS),
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + AuthService.SESSION_EXPIRES_IN_MS,
                     userAgent: params.userAgent,
                     ipAddress: params.ipAddress
                 })
