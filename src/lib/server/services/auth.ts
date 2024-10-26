@@ -1,9 +1,9 @@
-import type { DB } from "$lib/infra/db";
-import { Session, User } from "$lib/infra/db/schema";
-import genId from "$lib/utils/gen-id";
+import type { DB } from "../db";
+import { Session, User } from "../db/schema";
+import genId from "../../utils/gen-id";
 import type winston from "winston";
 import bcrypt from "bcryptjs";
-import { isDuplicateKeyError } from "$lib/infra/db/helpers";
+import { isDuplicateKeyError } from "../db/helpers";
 
 class AuthService {
     private db: DB;
@@ -80,14 +80,12 @@ class AuthService {
         }
     }
 
-
     private static isEmailValid(email: string): boolean {
         return true
     }
     private static isPasswordValid(email: string): boolean {
         return true
     }
-
 }
 
 export default AuthService

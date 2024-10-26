@@ -16,3 +16,5 @@ class AIService {
         //return this.googleGenerativeAIProvider("gemini-pro").doGenerate({inputFormat:"prompt",prompt:[{content:}]})
     }
 }
+
+export default AIService
