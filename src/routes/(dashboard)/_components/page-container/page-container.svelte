@@ -42,7 +42,7 @@
         </div>
     </div>
 
-    <div class="flex flex-col gap-y-4 w-full h-[calc(100%-52px)] flex-1 overflow-y-scroll ">
+    <div class="flex flex-col gap-y-4 w-full h-[calc(100%-52px)] flex-1 min-h-0">
         {@render children()}
     </div>
 </div>

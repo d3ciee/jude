@@ -9,7 +9,14 @@
 
     import ChevronsUpDown from "lucide-svelte/icons/chevrons-up-down";
 
-    import { Book, Contact, Gauge, Search, Ticket } from "lucide-svelte";
+    import {
+        Book,
+        Contact,
+        Gauge,
+        Search,
+        Plus,
+        AlignJustify,
+    } from "lucide-svelte";
 
     import * as DropdownMenu from "$lib/ui/dropdown-menu";
     import { Button } from "$lib/ui/button";
@@ -125,29 +132,14 @@
         </DropdownMenu.Root>
     </div>
 
-    <div class={cn("relative h-fit px-2", isCollapsed && "hidden")}>
-        <Input
-            placeholder="Search for anything..."
-            class="w-full h-8 pl-8 text-xs shadow-sm bg-elevated"
-            aria-label="Search"
-        />
-        <Search
-            class="absolute top-1/2 left-4 transform -translate-y-1/2 h-4 w-4 text-muted-foreground"
-        />
-        <span
-            class="absolute h-fit flex gap-1 top-1/2 right-4 transform -translate-y-1/2 items-center justify-center"
+    <div class={cn("relative h-fit px-2")}>
+        <Button
+            class={cn("w-full h-8", isCollapsed && "size-8")}
+            size={isCollapsed ? "icon" : "sm"}
         >
-            <kbd
-                class="h-5 w-5 shadow-sm inline-flex justify-center items-center border font-mono rounded-md bg-muted"
-            >
-                <Command class="w-3 h-3" />
-            </kbd>
-            <kbd
-                class="h-5 w-5 text-sm shadow-sm inline-flex justify-center items-center border font-mono rounded-md bg-muted"
-            >
-                k
-            </kbd>
-        </span>
+            <Plus class="w-4 h-4" />
+            <span class="ml-2" class:hidden={isCollapsed}>New application</span>
+        </Button>
     </div>
 
     <SidebarNav
@@ -162,32 +154,14 @@
             {
                 title: "Rules",
                 label: "9",
-                icon: Inbox,
+                icon: AlignJustify,
                 path: "/inbox",
-            },
-            {
-                title: "Tickets",
-                label: "9",
-                icon: Ticket,
-                path: "/tickets",
-            },
-            {
-                title: "Contacts",
-                label: "",
-                icon: Contact,
-                path: "/contacts",
             },
             {
                 title: "Analytics",
                 label: "",
                 icon: ChartBar,
                 path: "/analytics",
-            },
-            {
-                title: "Knowledge Base",
-                label: "23",
-                icon: Book,
-                path: "/knowledge-base",
             },
         ]}
     />
@@ -206,11 +180,6 @@
                 isCollapsed && "hidden",
             )}
         >
-            <img
-                src="https://www.263chat.com/wp-content/uploads/2022/06/ZB-Logo.jpeg"
-                alt="logo"
-                class="h-7 w-7 border rounded-md"
-            />
             <span class="text-xs"> </span>
         </div>
         <Button

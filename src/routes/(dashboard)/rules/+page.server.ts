@@ -1,6 +1,8 @@
 export const load = (async (e) => {
     //const rules = await e.locals.services.rules.getAllRules();
-    return {};
+    return {
+        rules: []
+    };
 });
 
 export const actions = {
