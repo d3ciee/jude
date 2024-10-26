@@ -11,6 +11,9 @@ importers:
       '@ai-sdk/google':
         specifier: ^0.0.54
         version: 0.0.54(zod@3.23.8)
+      '@fontsource/nunito':
+        specifier: ^5.1.0
+        version: 5.1.0
       '@libsql/client':
         specifier: ^0.14.0
         version: 0.14.0
@@ -593,6 +596,9 @@ packages:
 
   '@floating-ui/utils@0.2.8':
     resolution: {integrity: sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig==}
+
+  '@fontsource/nunito@5.1.0':
+    resolution: {integrity: sha512-+FuA/uyHXZPHAgNOmLq0GtsCAqx9IQjNnUyuGJYDl6xe+B2UIQO2pUFbWiWPfpYM7UfiPU9DBIT7s7Z9iGFoRw==}
 
   '@gcornut/valibot-json-schema@0.31.0':
     resolution: {integrity: sha512-3xGptCurm23e7nuPQkdrE5rEs1FeTPHhAUsBuwwqG4/YeZLwJOoYZv+fmsppUEfo5y9lzUwNQrNqLS/q7HMc7g==}
@@ -2375,6 +2381,8 @@ snapshots:
       '@floating-ui/utils': 0.2.8
 
   '@floating-ui/utils@0.2.8': {}
+
+  '@fontsource/nunito@5.1.0': {}
 
   '@gcornut/valibot-json-schema@0.31.0':
     dependencies:

@@ -39,6 +39,7 @@
 	},
 	"dependencies": {
 		"@ai-sdk/google": "^0.0.54",
+		"@fontsource/nunito": "^5.1.0",
 		"@libsql/client": "^0.14.0",
 		"bcryptjs": "^2.4.3",
 		"better-sqlite3": "^11.5.0",
