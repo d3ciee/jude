@@ -5,36 +5,92 @@
     import { Badge } from "$lib/ui/badge";
     import { Button } from "$lib/ui/button";
     import * as Card from "$lib/ui/card";
+    import * as Dialog from "$lib/ui/dialog";
+    import { Input } from "$lib/ui/input";
+    import { Label } from "$lib/ui/label";
     import * as DropdownMenu from "$lib/ui/dropdown-menu";
     import * as Table from "$lib/ui/table";
+
+    import CircleFadingPlus from "lucide-svelte/icons/circle-fading-plus";
+    import { Textarea } from "$lib/ui/textarea";
 </script>
 
-<PageContainer title="Rules">
-    <div class="w-full h-full p-6">
-        <Card.Root>
-            <Card.Header>
-                <Card.Title>Rules</Card.Title>
-                <Card.Description>
-                    Manage your rules and add new ones here and view their sales
-                    performance.
-                </Card.Description>
-            </Card.Header>
-            <Card.Content>
+<PageContainer title="">
+    <div class="w-full h-full p-6 grid gap-6">
+        <div class="flex justify-between">
+            <div class="grid gap-1.5">
+                <h1
+                    class="text-lg font-semibold leading-none tracking-tight space-y-1.5"
+                >
+                    Adjudication Rules
+                </h1>
+                <p class="text-muted-foreground text-sm">
+                    Manage rules that affect the claims adjudication process
+                </p>
+            </div>
+            <div>
+                <Dialog.Root>
+                    <Dialog.Trigger asChild let:builder>
+                        <Button size="sm" builders={[builder]}>
+                            <CircleFadingPlus class="h-4 w-4 mr-2" />
+                            Add new rule</Button
+                        >
+                    </Dialog.Trigger>
+                    <Dialog.Content class="sm:max-w-[425px]">
+                        <Dialog.Header>
+                            <Dialog.Title
+                                >Create new adjudication rule</Dialog.Title
+                            >
+                            <Dialog.Description>
+                                Create a new rule for the adjudication process.
+                                Please provide a name and description for the
+                                rule.
+                            </Dialog.Description>
+                        </Dialog.Header>
+                        <form method="POST" action="?/create">
+                            <div class="grid gap-4 py-4">
+                                <div
+                                    class="grid grid-cols-4 items-center gap-4"
+                                >
+                                    <Label for="name" class="text-right"
+                                        >Name</Label
+                                    >
+                                    <Input
+                                        id="name"
+                                        value=""
+                                        class="col-span-3"
+                                    />
+                                </div>
+                                <div
+                                    class="grid grid-cols-4 items-center gap-4"
+                                >
+                                    <Label for="username" class="text-right"
+                                        >Description</Label
+                                    >
+                                    <Textarea
+                                        id="description"
+                                        class="col-span-3"
+                                    />
+                                </div>
+                            </div>
+                            <Dialog.Footer>
+                                <Button type="submit">Save changes</Button>
+                            </Dialog.Footer>
+                        </form>
+                    </Dialog.Content>
+                </Dialog.Root>
+            </div>
+        </div>
+
+        <Card.Root class="p-0">
+            <Card.Content class="p-0">
                 <Table.Root>
-                    <Table.Header>
+                    <Table.Header class="bg-muted/40">
                         <Table.Row>
-                            <Table.Head class="hidden w-[100px] sm:table-cell">
-                                <span class="sr-only">Image</span>
-                            </Table.Head>
+                            <Table.Head>ID</Table.Head>
                             <Table.Head>Name</Table.Head>
                             <Table.Head>Status</Table.Head>
-                            <Table.Head>Price</Table.Head>
-                            <Table.Head class="hidden md:table-cell"
-                                >Total Sales</Table.Head
-                            >
-                            <Table.Head class="hidden md:table-cell"
-                                >Created at</Table.Head
-                            >
+                            <Table.Head>Created at</Table.Head>
                             <Table.Head>
                                 <span class="sr-only">Actions</span>
                             </Table.Head>

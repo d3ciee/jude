@@ -5,18 +5,19 @@ const User = sqliteTable("user", {
     id: text("id").notNull().primaryKey(),
     email: text("email").notNull().unique(),
     name: text("name").notNull(),
-    avatarUrl: text("avatar_url"),
-    passwordHash: text("password_hash"),
+    passwordHash: text("password_hash").notNull(),
     createdAt: integer("created_at").notNull()
 })
 
-const Session = sqliteTable("user_session", {
+const Session = sqliteTable("session", {
     id: text("id").notNull().primaryKey(),
     userId: text("user_id")
         .notNull()
         .references(() => User.id),
     expiresAt: integer("expires_at").notNull(),
-    createdAt: integer("created_at").notNull()
+    createdAt: integer("created_at").notNull(),
+    userAgent: text("user_agent"),
+    ipAddress: text("ip_address")
 });
 
 const sessionRelations = relations(Session, ({ one }) => ({
