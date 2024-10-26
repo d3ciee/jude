@@ -7,16 +7,20 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"migrations:generate": "drizzle-kit generate",
+		"migrations:push": "drizzle-kit push"
 	},
 	"devDependencies": {
 		"@internationalized/date": "^3.5.6",
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^4.0.0",
+		"@types/better-sqlite3": "^7.6.11",
 		"autoprefixer": "^10.4.20",
 		"bits-ui": "^0.21.16",
 		"cmdk-sv": "^0.0.18",
+		"drizzle-kit": "^0.26.2",
 		"embla-carousel-svelte": "^8.3.0",
 		"formsnap": "^1.0.1",
 		"lucide-svelte": "^0.453.0",
@@ -33,7 +37,10 @@
 		"zod": "^3.23.8"
 	},
 	"dependencies": {
+		"@libsql/client": "^0.14.0",
+		"better-sqlite3": "^11.5.0",
 		"clsx": "^2.1.1",
+		"drizzle-orm": "^0.35.3",
 		"tailwind-merge": "^2.5.4",
 		"tailwind-variants": "^0.2.1"
 	}

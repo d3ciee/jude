@@ -154,13 +154,13 @@
         {isCollapsed}
         routes={[
             {
-                title: "Dashboard",
+                title: "Overview",
                 label: "128",
                 icon: Gauge,
                 path: "/",
             },
             {
-                title: "Inbox",
+                title: "Rules",
                 label: "9",
                 icon: Inbox,
                 path: "/inbox",

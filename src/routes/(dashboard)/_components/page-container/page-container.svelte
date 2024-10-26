@@ -15,7 +15,7 @@
     const {title, children, actions}:Props = $props();
 </script>
 
-<div class="w-full h-screen flex flex-col">
+<div class="w-full h-screen flex flex-col bg-muted/40">
     <div class="flex h-[52px] justify-between p-2 border-b">
         <div class="flex items-center">
             <h1 class="text font-semibold pl-3">{title}</h1>
