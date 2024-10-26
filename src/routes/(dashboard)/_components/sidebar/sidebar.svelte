@@ -71,7 +71,7 @@
                     <div
                         class="text-xs text-muted-foreground leading-none text-left w-full"
                     >
-                        decent@mobisoft.co.zw
+                        decent@gmail.co.zw
                     </div>
                 </span>
                 <ChevronsUpDown
