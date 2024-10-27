@@ -126,7 +126,7 @@
         </DropdownMenu.Root>
     </div>
 
-    <div class={cn("relative h-fit px-2")}>
+    <div class={cn("relative h-fit p-3 py-1")}>
         <Button
             class={cn("w-full h-8 text-sm", isCollapsed && "size-8")}
             size={isCollapsed ? "icon" : "sm"}

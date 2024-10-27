@@ -3,7 +3,12 @@
     import ArrowUpRight from "lucide-svelte/icons/arrow-up-right";
     import CreditCard from "lucide-svelte/icons/credit-card";
     import DollarSign from "lucide-svelte/icons/dollar-sign";
+    import Clock from "lucide-svelte/icons/clock";
+
+    import { Chart, Svg, Axis,Spline,Tooltip,Text,Highlight } from 'layerchart';
+
     import Users from "lucide-svelte/icons/users";
+
 
     import * as Card from "$lib/ui/card";
     import * as Table from "$lib/ui/table";
@@ -11,84 +16,61 @@
     import { Badge } from "$lib/ui/badge";
     import * as Avatar from "$lib/ui/avatar";
     import PageContainer from "../_components/page-container";
+    import { Medal, Star, TriangleAlert } from "lucide-svelte";
+
+    const {data} = $props();
+
 </script>
 
+{#snippet KpiCard({title, icon, value, previousValue}:any)}
+<Card.Root>
+    <Card.Header
+        class="flex flex-row items-center justify-between space-y-0 pb-1 p-4"
+    >
+        <Card.Title class="text-sm font-medium"
+            >{title}</Card.Title
+        >
+        <svelte:component this={icon} class="text-muted-foreground h-4 w-4" />
+    </Card.Header>
+    <Card.Content class="p-4 pt-0">
+        <div class="text-2xl font-bold">{value}</div>
+        <p class="text-muted-foreground text-xs">
+            {previousValue} previous week
+        </p>
+    </Card.Content>
+</Card.Root>
+{/snippet}
+
 <PageContainer title="Overview">
-    <div class="flex min-h-screen w-full flex-col">
-        <main class="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
-            <div class="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
-                <Card.Root>
-                    <Card.Header
-                        class="flex flex-row items-center justify-between space-y-0 pb-2"
-                    >
-                        <Card.Title class="text-sm font-medium"
-                            >Total Revenue</Card.Title
-                        >
-                        <DollarSign class="text-muted-foreground h-4 w-4" />
-                    </Card.Header>
-                    <Card.Content>
-                        <div class="text-2xl font-bold">$45,231.89</div>
-                        <p class="text-muted-foreground text-xs">
-                            +20.1% from last month
-                        </p>
-                    </Card.Content>
-                </Card.Root>
-                <Card.Root>
-                    <Card.Header
-                        class="flex flex-row items-center justify-between space-y-0 pb-2"
-                    >
-                        <Card.Title class="text-sm font-medium"
-                            >Subscriptions</Card.Title
-                        >
-                        <Users class="text-muted-foreground h-4 w-4" />
-                    </Card.Header>
-                    <Card.Content>
-                        <div class="text-2xl font-bold">+2350</div>
-                        <p class="text-muted-foreground text-xs">
-                            +180.1% from last month
-                        </p>
-                    </Card.Content>
-                </Card.Root>
-                <Card.Root>
-                    <Card.Header
-                        class="flex flex-row items-center justify-between space-y-0 pb-2"
-                    >
-                        <Card.Title class="text-sm font-medium"
-                            >Sales</Card.Title
-                        >
-                        <CreditCard class="text-muted-foreground h-4 w-4" />
-                    </Card.Header>
-                    <Card.Content>
-                        <div class="text-2xl font-bold">+12,234</div>
-                        <p class="text-muted-foreground text-xs">
-                            +19% from last month
-                        </p>
-                    </Card.Content>
-                </Card.Root>
-                <Card.Root>
-                    <Card.Header
-                        class="flex flex-row items-center justify-between space-y-0 pb-2"
-                    >
-                        <Card.Title class="text-sm font-medium"
-                            >Active Now</Card.Title
-                        >
-                        <Activity class="text-muted-foreground h-4 w-4" />
-                    </Card.Header>
-                    <Card.Content>
-                        <div class="text-2xl font-bold">+573</div>
-                        <p class="text-muted-foreground text-xs">
-                            +201 since last hour
-                        </p>
-                    </Card.Content>
-                </Card.Root>
+    <div class="flex min-h-screen w-full flex-col p-6 gap-6 overflow-y-scroll">
+        <div class="grid gap-1.5">
+            <h1
+                class="text-lg font-semibold leading-none tracking-tight space-y-1.5"
+            >
+                Overview
+            </h1>
+            <p class="text-muted-foreground text-sm">
+                A summary of what has been happening.
+            </p>
+        </div>
+        <main class="flex flex-1 flex-col gap-4">
+            <div class="grid gap-4 grid-cols-4">
+                {@render KpiCard({title:"Avg Claim Processing Time", icon: Clock, value:"2m 52s", previousValue:"3m 12s"})}
+                {@render KpiCard({title:" First-Pass Resolution Rate", icon: Medal, value:"98%", previousValue:"95%"})}
+                {@render KpiCard({title:"Claim denial rate", icon: TriangleAlert, value:"2%", previousValue:"5%"})}
+                {@render KpiCard({title:"User satisfaction score", icon: Star, value:"4.9/5", previousValue:"4.5"})}
             </div>
+            <div class="h-[300px] p-4 border rounded">
+                TODO: add chart here
+              </div>
+              
             <div class="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
                 <Card.Root class="xl:col-span-2">
                     <Card.Header class="flex flex-row items-center">
                         <div class="grid gap-2">
-                            <Card.Title>Transactions</Card.Title>
+                            <Card.Title>Claims</Card.Title>
                             <Card.Description
-                                >Recent transactions from your store.</Card.Description
+                                >Recent claims applied for.</Card.Description
                             >
                         </div>
                         <Button href="##" size="sm" class="ml-auto gap-1">

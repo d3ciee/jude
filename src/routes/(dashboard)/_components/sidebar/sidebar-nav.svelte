@@ -11,9 +11,7 @@
 </script>
 
 <div data-collapsed={isCollapsed} class="group flex flex-col gap-4">
-    <nav
-        class="grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2"
-    >
+    <nav class="grid gap-1 group-[[data-collapsed=true]]:justify-center px-3">
         {#each routes as route}
             {#if isCollapsed}
                 <Tooltip.Root openDelay={0}>
@@ -25,11 +23,7 @@
                                 ? "secondary"
                                 : "ghost"}
                             size="icon"
-                            class={cn(
-                                "size-8",
-                                route.path !== selected &&
-                                    "dark:bg-muted dark:text-muted-foreground dark:hover:bg-muted dark:hover:text-white",
-                            )}
+                            class={cn("size-8")}
                         >
                             <svelte:component
                                 this={route.icon}
