@@ -22,7 +22,7 @@
                             href={route.path}
                             builders={[builder]}
                             variant={route.path === selected
-                                ? "default"
+                                ? "secondary"
                                 : "ghost"}
                             size="icon"
                             class={cn(

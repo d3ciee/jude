@@ -73,7 +73,7 @@
         };
 </script>
 
-<PageContainer title="">
+<PageContainer title="Rules">
     <div class="w-full h-full p-6 flex flex-col gap-6">
         <div class="flex justify-between">
             <div class="grid gap-1.5">

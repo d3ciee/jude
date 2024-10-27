@@ -8,12 +8,8 @@ import genId from "$lib/utils/gen-id";
 export const handle: Handle = async ({ event, resolve }) => {
     const db = init();
     const logger = createLogger({
-        level: 'info',
-        format: format.combine(
-            format.colorize(),
-            format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-            format.printf(({ timestamp, level, message }) => `${timestamp} ${level}: ${message}`)
-        ),
+        level: 'debug',
+
         transports: [
             new transports.Console(),
         ],
@@ -41,8 +37,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.locals.db = db;
     event.locals.logger = logger.child({ requestId });
     event.locals.services = {
-        rules: new RulesService(requestContext, db, logger),
-        oai: new OpenAIService(logger)
+        rules: new RulesService(requestContext, db, event.locals.logger),
+        oai: new OpenAIService(event.locals.logger)
     }
 
     return await resolve(event);

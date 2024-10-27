@@ -32,7 +32,7 @@
 <div class="flex flex-col border-r h-full gap-2 bg-muted/40 sticky">
     <div
         class={cn(
-            "flex h-[52px] items-center justify-center border-b",
+            "flex h-[52px] items-center justify-center border-b ",
             isCollapsed ? "h-[52px]" : "px-2 w-64",
         )}
     >
@@ -128,7 +128,7 @@
 
     <div class={cn("relative h-fit px-2")}>
         <Button
-            class={cn("w-full h-8", isCollapsed && "size-8")}
+            class={cn("w-full h-8 text-sm", isCollapsed && "size-8")}
             size={isCollapsed ? "icon" : "sm"}
         >
             <Plus class="w-4 h-4" />

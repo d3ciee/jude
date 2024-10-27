@@ -44,6 +44,8 @@ const rulesRelations = relations(Rule, ({ one }) => ({
     })
 }))
 
+
+
 export {
     User,
     Session,
