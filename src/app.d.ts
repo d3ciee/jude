@@ -1,4 +1,7 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
+
+import type AuthService from "$lib/services/auth";
+
 // for information about these interfaces
 declare global {
 	namespace App {
@@ -6,8 +9,9 @@ declare global {
 		interface Locals {
 			db: import("$lib/server/db").DB;
 			logger: import("winston").Logger;
+			session?: import("$lib/services/auth").Session;
 			services: {
-				rules: import("$lib/server/services/rules").default;
+				rules: import("$lib/services/rules").default;
 				oai: import("$lib/server/services/oai").default;
 			}
 		}

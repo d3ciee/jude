@@ -1,4 +1,3 @@
-import { __PSLockDownPolicy } from './../../../../.svelte-kit/ambient.d';
 import { OPENAI_API_KEY, OPENAI_ASSISTANT_ID } from '$env/static/private';
 import { OpenAI, toFile } from 'openai';
 import type winston from 'winston';
