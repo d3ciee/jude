@@ -3,7 +3,7 @@
   import { Button } from "$lib/ui/button";
   import { Card } from "$lib/ui/card";
   import { Progress } from "$lib/ui/progress";
-  import { Alert, AlertDescription } from "$lib/ui/alert";
+  import { Alert, AlertDescription, AlertTitle } from "$lib/ui/alert";
   import { Badge } from "$lib/ui/badge";
   import PageContainer from "../_components/page-container";
   import Upload from "lucide-svelte/icons/upload";
@@ -69,7 +69,7 @@
         </Button>
 
         {#if loading}
-          <Progress value={null} class="w-full" />
+          <Progress value={50} class="w-full" />
         {/if}
 
         {#if error}
@@ -137,7 +137,7 @@
               <div class="space-y-2">
                 {#each analysis.rule_violations as violation}
                   <Alert variant="destructive">
-                    <AlertTitle>{violation.rule}</AlertTitle>
+                    <AlertTitle>{violation.rule.name}</AlertTitle>
                     <AlertDescription>{violation.description}</AlertDescription>
                   </Alert>
                 {/each}

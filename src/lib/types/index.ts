@@ -1,4 +1,4 @@
-// Entity Types
+
 export interface User {
     id: string;
     email: string;
@@ -25,7 +25,6 @@ export interface Rule {
     createdBy: string;
 }
 
-// DTOs
 export interface CreateRule {
     name: string;
     description: string;
