@@ -1,5 +1,4 @@
 import { nanoid } from "nanoid";
 
-const length = 7;
-const genId = () => nanoid(length);
+const genId = (length = 7) => nanoid(length);
 export default genId;

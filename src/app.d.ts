@@ -11,20 +11,22 @@ declare global {
 		success: false;
 		error: string;
 	};
+
+
 	namespace App {
-		// interface Error {}
+		type RequestContext = {
+			userId: string;
+			requestId: string;
+		}
 		interface Locals {
 			db: import("$lib/server/db").DB;
 			logger: import("winston").Logger;
-			session?: import("$lib/services/auth").Session;
+			session?: import("$lib/types").Session;
 			services: {
-				rules: import("$lib/services/rules").default;
+				rules: import("$lib/server/services/rules").default;
 				oai: import("$lib/server/services/oai").default;
 			}
 		}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
 	}
 }
 

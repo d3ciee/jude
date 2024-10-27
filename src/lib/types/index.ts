@@ -7,7 +7,7 @@ export interface User {
     createdAt: number;
 }
 
-export interface Session {
+export type Session = {
     id: string;
     userId: string;
     expiresAt: number;
@@ -16,17 +16,26 @@ export interface Session {
     ipAddress: string | null;
 }
 
-export interface Rule {
+export type Rule = {
     id: string;
     description: string;
     name: string;
     active: boolean;
     createdAt: number;
-    createdBy: string;
+    createdBy: {
+        name: string;
+        email: string;
+        id: string;
+    };
 }
 
 // DTOs
 export interface CreateRule {
     name: string;
     description: string;
+}
+
+export type GetListOfRules = {
+    limit: number;
+    offset: number;
 }
