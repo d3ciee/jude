@@ -1,6 +1,7 @@
 import type { Handle } from "@sveltejs/kit";
 import init from "$lib/server/db";
 import RulesService from "$lib/server/services/rules";
+import OpenAIService from "$lib/server/services/oai";
 import { createLogger, format, transports } from "winston";
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -21,6 +22,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.locals.logger = logger;
     event.locals.services = {
         rules: new RulesService(db, logger),
+        oai: new OpenAIService(logger)
     }
 
     return await resolve(event);

@@ -8,6 +8,7 @@ declare global {
 			logger: import("winston").Logger;
 			services: {
 				rules: import("$lib/server/services/rules").default;
+				oai: import("$lib/server/services/oai").default;
 			}
 		}
 		// interface PageData {}
