@@ -14,7 +14,9 @@
     import CircleFadingPlus from "lucide-svelte/icons/circle-fading-plus";
     import { Textarea } from "$lib/ui/textarea";
 
-    const { rules } = $props();
+    const { data } = $props();
+    const { rules } = data;
+    
 </script>
 
 <PageContainer title="">
@@ -59,7 +61,7 @@
                                     >
                                     <Input
                                         id="name"
-                                        value=""
+                                        name="name"
                                         class="col-span-3"
                                     />
                                 </div>
@@ -71,6 +73,7 @@
                                     >
                                     <Textarea
                                         id="description"
+                                        name="description"
                                         class="col-span-3"
                                     />
                                 </div>
@@ -99,7 +102,7 @@
                         </Table.Row>
                     </Table.Header>
                     <Table.Body>
-                        {#each rules as rule}
+                        {#each rules || [] as rule}
                             <Table.Row>
                                 <Table.Cell>{rule.id}</Table.Cell>
                                 <Table.Cell>{rule.name}</Table.Cell>

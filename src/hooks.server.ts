@@ -1,6 +1,6 @@
 import type { Handle } from "@sveltejs/kit";
-import init from "./lib/infra/db";
-import RulesService from "$lib/services/rules";
+import init from "$lib/server/db";
+import RulesService from "$lib/server/services/rules";
 import { createLogger, format, transports } from "winston";
 
 export const handle: Handle = async ({ event, resolve }) => {

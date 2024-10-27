@@ -4,12 +4,11 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-			db: import("$lib/infra/db").DB;
+			db: import("$lib/server/db").DB;
 			logger: import("winston").Logger;
 			services: {
-				rules: import("$lib/services/rules").default;
+				rules: import("$lib/server/services/rules").default;
 			}
-
 		}
 		// interface PageData {}
 		// interface PageState {}
