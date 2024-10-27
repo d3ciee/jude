@@ -4,6 +4,13 @@ import type AuthService from "$lib/services/auth";
 
 // for information about these interfaces
 declare global {
+	type Result<T> = {
+		success: true;
+		data: T;
+	} | {
+		success: false;
+		error: Error;
+	};
 	namespace App {
 		// interface Error {}
 		interface Locals {
