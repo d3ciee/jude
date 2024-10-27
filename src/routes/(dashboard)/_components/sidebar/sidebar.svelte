@@ -27,6 +27,16 @@
         },
     ];
     let isCollapsed = false;
+    
+    // Initialize from localStorage
+    if (typeof window !== 'undefined') {
+        isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    }
+
+    // Update localStorage when state changes
+    $: if (typeof window !== 'undefined') {
+        localStorage.setItem('sidebarCollapsed', isCollapsed.toString());
+    }
 </script>
 
 <div class="flex flex-col border-r h-full gap-2 bg-muted/40 sticky">

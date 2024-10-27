@@ -5,13 +5,36 @@
   import { Progress } from "$lib/ui/progress";
   import { Alert, AlertDescription, AlertTitle } from "$lib/ui/alert";
   import { Badge } from "$lib/ui/badge";
+  import { Skeleton } from "$lib/ui/skeleton";
   import PageContainer from "../_components/page-container";
   import Upload from "lucide-svelte/icons/upload";
+  import { onDestroy } from "svelte";
 
   let loading = false;
   let error: string | null = null;
   let analysis: any = null;
   let fileName: string | null = null;
+  let progressValue = 0;
+  let progressInterval: ReturnType<typeof setInterval>;
+
+  function startProgressSimulation() {
+    progressValue = 0;
+    progressInterval = setInterval(() => {
+      progressValue += 10;
+      if (progressValue >= 100) {
+        clearInterval(progressInterval);
+      }
+    }, 1000);
+  }
+
+  function stopProgressSimulation() {
+    clearInterval(progressInterval);
+    progressValue = 0;
+  }
+
+  onDestroy(() => {
+    clearInterval(progressInterval);
+  });
 
   function handleFileSelect(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -32,7 +55,9 @@
         use:enhance={() => {
           loading = true;
           error = null;
+          startProgressSimulation();
           return async ({ result }) => {
+            stopProgressSimulation();
             console.log(result);
             loading = false;
             if (result.type === "success") {
@@ -69,7 +94,7 @@
         </Button>
 
         {#if loading}
-          <Progress value={50} class="w-full" />
+          <Progress value={progressValue} class="w-full" />
         {/if}
 
         {#if error}
@@ -83,7 +108,32 @@
     <!-- Analysis Results -->
     <Card class="flex-1 p-6">
       <h3 class="text-lg font-semibold mb-4">Analysis Results</h3>
-      {#if analysis}
+      {#if loading}
+        <div class="space-y-6">
+          <div>
+            <Skeleton class="h-6 w-32 mb-4" />
+            <div class="grid grid-cols-2 gap-4">
+              <Skeleton class="h-4 w-full" />
+              <Skeleton class="h-4 w-full" />
+            </div>
+          </div>
+          <div>
+            <Skeleton class="h-6 w-32 mb-4" />
+            <div class="grid grid-cols-2 gap-4">
+              <Skeleton class="h-4 w-full" />
+              <Skeleton class="h-4 w-full" />
+              <Skeleton class="h-4 w-full" />
+            </div>
+          </div>
+          <div>
+            <Skeleton class="h-6 w-32 mb-4" />
+            <div class="space-y-2">
+              <Skeleton class="h-4 w-full" />
+              <Skeleton class="h-4 w-3/4" />
+            </div>
+          </div>
+        </div>
+      {:else if analysis}
         <div class="space-y-6">
           <!-- Claimant Info -->
           <div>
