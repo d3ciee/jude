@@ -9,7 +9,7 @@ declare global {
 		data: T;
 	} | {
 		success: false;
-		error: Error;
+		error: string;
 	};
 	namespace App {
 		// interface Error {}
