@@ -28,18 +28,28 @@ const sessionRelations = relations(Session, ({ one }) => ({
     })
 }))
 
-const Rules = sqliteTable("rules", {
+const Rule = sqliteTable("rules", {
     id: text("id").notNull().primaryKey(),
     description: text("description").notNull(),
-    name: text("name").notNull(),
+    name: text("name").notNull().unique(),
     active: integer({ mode: 'boolean' }).notNull(),
     createdAt: integer("created_at").notNull(),
     createdBy: text("created_by").notNull().references(() => User.id)
 });
 
+const rulesRelations = relations(Rule, ({ one }) => ({
+    createdBy: one(User, {
+        fields: [Rule.createdBy],
+        references: [User.id]
+    })
+}))
+
+
+
 export {
     User,
     Session,
-    Rules,
+    Rule,
+    rulesRelations,
     sessionRelations
 }

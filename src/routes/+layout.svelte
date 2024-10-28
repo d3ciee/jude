@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Toaster } from '$lib/ui/sonner';
 	import '../app.css';
 
 	import "@fontsource/nunito";
@@ -15,3 +16,4 @@
 </script>
 
 {@render children()}
+<Toaster />
