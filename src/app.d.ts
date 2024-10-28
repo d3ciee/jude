@@ -24,6 +24,7 @@ declare global {
 			session?: import("$lib/types").Session;
 			services: {
 				rules: import("$lib/server/services/rules").default;
+				claims: import("$lib/server/services/claims").default;
 				oai: import("$lib/server/services/oai").default;
 			}
 		}

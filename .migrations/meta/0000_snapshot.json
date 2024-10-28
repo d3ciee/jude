@@ -1,9 +1,142 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "84a279ac-d834-437c-9295-6caa473c40cf",
+  "id": "0f1dd09b-791b-4bdd-9387-f4077ee0fcce",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "types": {
+      "name": "types",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "stage": {
+          "name": "stage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "processing_step": {
+          "name": "processing_step",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "submitted_by": {
+          "name": "submitted_by",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "submission_channel": {
+          "name": "submission_channel",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "files": {
+      "name": "files",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "file_storage_key": {
+          "name": "file_storage_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "size": {
+          "name": "size",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "claim_id": {
+          "name": "claim_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "files_file_storage_key_unique": {
+          "name": "files_file_storage_key_unique",
+          "columns": [
+            "file_storage_key"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "files_claim_id_types_id_fk": {
+          "name": "files_claim_id_types_id_fk",
+          "tableFrom": "files",
+          "tableTo": "types",
+          "columnsFrom": [
+            "claim_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "rules": {
       "name": "rules",
       "columns": {
@@ -50,7 +183,15 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "rules_name_unique": {
+          "name": "rules_name_unique",
+          "columns": [
+            "name"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
         "rules_created_by_user_id_fk": {
           "name": "rules_created_by_user_id_fk",

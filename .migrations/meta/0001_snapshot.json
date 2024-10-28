@@ -1,11 +1,11 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "0a430527-9d3b-4a0a-b056-37d05de000fd",
-  "prevId": "84a279ac-d834-437c-9295-6caa473c40cf",
+  "id": "3aa8e499-db8d-4c01-91b0-af26c2c2fdd1",
+  "prevId": "0f1dd09b-791b-4bdd-9387-f4077ee0fcce",
   "tables": {
-    "types": {
-      "name": "types",
+    "claim": {
+      "name": "claim",
       "columns": {
         "id": {
           "name": "id",
@@ -32,7 +32,7 @@
           "name": "processing_step",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "submitted_by": {
@@ -46,7 +46,7 @@
           "name": "submission_channel",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         }
       },
@@ -80,6 +80,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "file_storage_key": {
+          "name": "file_storage_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "size": {
           "name": "size",
           "type": "integer",
@@ -102,12 +109,20 @@
           "autoincrement": false
         }
       },
-      "indexes": {},
+      "indexes": {
+        "files_file_storage_key_unique": {
+          "name": "files_file_storage_key_unique",
+          "columns": [
+            "file_storage_key"
+          ],
+          "isUnique": true
+        }
+      },
       "foreignKeys": {
-        "files_claim_id_types_id_fk": {
-          "name": "files_claim_id_types_id_fk",
+        "files_claim_id_claim_id_fk": {
+          "name": "files_claim_id_claim_id_fk",
           "tableFrom": "files",
-          "tableTo": "types",
+          "tableTo": "claim",
           "columnsFrom": [
             "claim_id"
           ],
@@ -320,7 +335,9 @@
   "enums": {},
   "_meta": {
     "schemas": {},
-    "tables": {},
+    "tables": {
+      "\"types\"": "\"claim\""
+    },
     "columns": {}
   },
   "internal": {
