@@ -6,13 +6,14 @@
   import { Alert, AlertDescription, AlertTitle } from "$lib/ui/alert";
   import { Badge } from "$lib/ui/badge";
   import { Skeleton } from "$lib/ui/skeleton";
-  import PageContainer from "../../_components/page-container";
   import Upload from "lucide-svelte/icons/upload";
   import { onDestroy } from "svelte";
+  import PageContainer from "../../_components/page-container";
+  import type { GptResponse } from "$lib/types";
+  import { toast } from "$lib/ui/sonner";
 
   let loading = false;
-  let error: string | null = null;
-  let analysis: any = null;
+  let result: Result<GptResponse> | null = null;
   let fileName: string | null = null;
   let progressValue = 0;
   let progressInterval: ReturnType<typeof setInterval>;
@@ -54,16 +55,20 @@
         enctype="multipart/form-data"
         use:enhance={() => {
           loading = true;
-          error = null;
           startProgressSimulation();
-          return async ({ result }) => {
+          return async ({ result: formResult }) => {
             stopProgressSimulation();
-            console.log(result);
+            console.log(formResult);
             loading = false;
-            if (result.type === "success") {
-              analysis = result?.data?.analysis;
+
+            if (formResult.type === "success" && formResult.data !== null) {
+              console.log(result);
+              result = formResult.data as Result<GptResponse>;
+              if (result.success) {
+                toast.success("Document analyzed successfully");
+              }
             } else {
-              error = "Failed to analyze document";
+              toast.error("Something went wrong");
             }
           };
         }}
@@ -97,9 +102,9 @@
           <Progress value={progressValue} class="w-full" />
         {/if}
 
-        {#if error}
+        {#if result !== null && !result.success}
           <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
+            <AlertDescription>{result.error}</AlertDescription>
           </Alert>
         {/if}
       </form>
@@ -133,14 +138,14 @@
             </div>
           </div>
         </div>
-      {:else if analysis}
+      {:else if result !== null && result.success && result.data.isValid && result.data.analysis !== null}
         <div class="space-y-6">
           <!-- Claimant Info -->
           <div>
             <h4 class="text-sm font-semibold mb-2">Claimant Information</h4>
             <div class="grid grid-cols-2 gap-2 text-sm">
-              <div>Name: {analysis.claimant.name}</div>
-              <div>Age: {analysis.claimant.age}</div>
+              <div>Name: {result.data.analysis.claimant.name}</div>
+              <div>Age: {result.data.analysis.claimant.age}</div>
             </div>
           </div>
 
@@ -148,11 +153,11 @@
           <div>
             <h4 class="text-sm font-semibold mb-2">Claim Details</h4>
             <div class="grid grid-cols-2 gap-2 text-sm">
-              <div>Date: {analysis.claim_details.submission_date}</div>
-              <div>Type: {analysis.claim_details.treatment_type}</div>
-              <div>Provider: {analysis.claim_details.healthcare_provider}</div>
-              <div>Amount: ${analysis.claim_details.claim_amount}</div>
-              <div>Location: {analysis.claim_details.location}</div>
+              <div>Date: {result.data.analysis.claimDetails.submissionDate}</div>
+              <div>Type: {result.data.analysis.claimDetails.treatmentType}</div>
+              <div>Provider: {result.data.analysis.claimDetails.healthcareProvider}</div>
+              <div>Amount: ${result.data.analysis.claimDetails.claimAmount}</div>
+              <div>Location: {result.data.analysis.claimDetails.location}</div>
             </div>
           </div>
 
@@ -163,16 +168,16 @@
               <div class="flex items-center gap-2">
                 <div>Trust Score:</div>
                 <Progress
-                  value={analysis.fraud_detection.trustability_score}
+                  value={result.data.analysis.fraudDetection.trustabilityScore}
                   class="w-32"
                 />
                 <span class="text-sm"
-                  >{analysis.fraud_detection.trustability_score}%</span
+                  >{result.data.analysis.fraudDetection.trustabilityScore}%</span
                 >
               </div>
-              {#if analysis.fraud_detection.flags.length > 0}
+              {#if result.data.analysis.fraudDetection.flags.length > 0}
                 <div class="flex gap-2 flex-wrap">
-                  {#each analysis.fraud_detection.flags as flag}
+                  {#each result.data.analysis.fraudDetection.flags as flag}
                     <Badge variant="destructive">{flag}</Badge>
                   {/each}
                 </div>
@@ -181,13 +186,13 @@
           </div>
 
           <!-- Rule Violations -->
-          {#if analysis.rule_violations.length > 0}
+          {#if result.data.analysis.ruleViolations.length > 0}
             <div>
               <h4 class="text-sm font-semibold mb-2">Rule Violations</h4>
               <div class="space-y-2">
-                {#each analysis.rule_violations as violation}
+                {#each result.data.analysis.ruleViolations as violation}
                   <Alert variant="destructive">
-                    <AlertTitle>{violation.rule.name}</AlertTitle>
+                    <AlertTitle>{violation.rule}</AlertTitle>
                     <AlertDescription>{violation.description}</AlertDescription>
                   </Alert>
                 {/each}
@@ -200,18 +205,24 @@
             <h4 class="text-sm font-semibold mb-2">Processing Metrics</h4>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <div>
-                Est. Processing Time: {analysis.metrics.estimated_payout_time}
+                Est. Processing Time: {result.data.analysis.metrics.estimatedPayoutTime}
               </div>
               <div>
-                Potential Savings: ${analysis.metrics.potential_savings}
+                Potential Savings: ${result.data.analysis.metrics.potentialSavings}
               </div>
-              {#if analysis.metrics.human_intervention_required}
+              {#if result.data.analysis.metrics.humanInterventionRequired}
                 <div class="col-span-2">
                   <Badge>Requires Manual Review</Badge>
                 </div>
               {/if}
             </div>
           </div>
+        </div>
+      {:else if result !== null && result.success && !result.data.isValid}
+        <div>
+          <Alert variant="destructive">
+              The uploaded document could not be processed. Please check the file format and try again.
+          </Alert>
         </div>
       {:else}
         <div class="text-muted-foreground text-center">

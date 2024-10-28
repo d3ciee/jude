@@ -35,37 +35,41 @@ export interface CreateRule {
 }
 
 
-export interface ClaimAnalysis {
-    isValid: boolean;
-    analysis: {
-        claimant: {
-            name: string;
-            age: number;
-        };
-        claimDetails: {
-            submissionDate: string;
-            treatmentType: string;
-            healthcareProvider: string;
-            claimAmount: number;
-            location: string;
-            supportingDocuments: string;
-        };
-        fraudDetection: {
-            trustabilityScore: number;
-            flags: string[];
-        };
-        ruleViolations: {
-            rule: string;
-            description: string;
-        }[];
-        metrics: {
-            estimatedPayoutTime: string;
-            missingInformation: string[];
-            potentialSavings: number;
-            humanInterventionRequired: boolean;
-        };
-    } | null;
+
+export type GptResponse = {
+    isValid: boolean,
+    analysis: ClaimAnalysis | null;
 }
+
+export type ClaimAnalysis = {
+    claimant: {
+        name: string;
+        age: number;
+    };
+    claimDetails: {
+        submissionDate: string;
+        treatmentType: string;
+        healthcareProvider: string;
+        claimAmount: number;
+        location: string;
+        supportingDocuments: string;
+    };
+    fraudDetection: {
+        trustabilityScore: number;
+        flags: string[];
+    };
+    ruleViolations: {
+        rule: string;
+        description: string;
+    }[];
+    metrics: {
+        estimatedPayoutTime: string;
+        missingInformation: string[];
+        potentialSavings: number;
+        humanInterventionRequired: boolean;
+    };
+}
+
 
 export type GetListOfRules = {
     limit: number;
