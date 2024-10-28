@@ -48,6 +48,7 @@
 		"@fontsource/nunito": "^5.1.0",
 		"@libsql/client": "^0.14.0",
 		"@sveltejs/adapter-node": "^5.2.9",
+		"@sveltejs/adapter-vercel": "^5.4.6",
 		"@webhooksite/cli": "^0.2.3",
 		"bcryptjs": "^2.4.3",
 		"better-sqlite3": "^11.5.0",
