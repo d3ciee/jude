@@ -4,6 +4,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 
     const formData = await request.formData()
+    console.log(formData)
 
     const attachmentCount = Number(formData.get('attachment-count'))
     const messageBody = formData.get("body-plain")
