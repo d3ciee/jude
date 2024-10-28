@@ -114,10 +114,11 @@
                         <Table.Header class="bg-muted/40">
                             <Table.Row>
                                 <Table.Head>ID</Table.Head>
-                                <Table.Head>Status</Table.Head>
+                                <Table.Head>Approval status</Table.Head>
                                 <Table.Head>Processing step</Table.Head>
                                 <Table.Head>Submitted by</Table.Head>
                                 <Table.Head>Submission channel</Table.Head>
+                                <Table.Head>Number of files</Table.Head>
                                 <Table.Head>Created at</Table.Head>
                                 
                             </Table.Row>
@@ -132,35 +133,38 @@
                             </Table.Body>
                         {:else}
                             <Table.Body class="h-fit">
-                                {#each claims as rule (rule.id)}
+                                {#each claims as claim (claim.id)}
                                     <Table.Row class="h-fit">
                                         <Table.Cell>
-                                            <a href="/claims/{rule.id}" class="underline underline-offset-4 hover:text-primary cursor-pointer">
-                                                {rule.id}
+                                            <a href="/claims/{claim.id}" class="underline underline-offset-4 hover:text-primary cursor-pointer">
+                                                {claim.id}
                                             </a>
                                         </Table.Cell>
 
                                         <Table.Cell>                                     
                                             <Badge variant="outline">
-                                                {rule.status}
+                                                {claim.status}
                                             </Badge>                              
                                         </Table.Cell>
                                         <Table.Cell>
                                             <Badge
                                                 variant={"outline"}
                                             >
-                                                {rule.procesingStep}
+                                                {claim.procesingStep}
                                             </Badge>
                                         </Table.Cell>
                                         <Table.Cell
-                                            >{rule.submittedBy}</Table.Cell
+                                            >{claim.submittedBy}</Table.Cell
                                         >
                                         <Table.Cell
-                                            >{rule.submissionChannel}</Table.Cell
+                                            >{claim.submissionChannel}</Table.Cell
+                                        >
+                                        <Table.Cell
+                                            >{claim.files}</Table.Cell
                                         >
                                         <Table.Cell
                                             >{new Date(
-                                                rule.createdAt,
+                                                claim.createdAt,
                                             ).toLocaleDateString()}</Table.Cell
                                         >
                                     </Table.Row>

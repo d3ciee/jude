@@ -44,7 +44,7 @@ const rulesRelations = relations(Rule, ({ one }) => ({
     })
 }))
 
-const Claim = sqliteTable("types", {
+const Claim = sqliteTable("claim", {
     id: text("id").notNull().primaryKey(),
     createdAt: integer("created_at").notNull(),
     status: text("stage", { enum: ["pending", "approved", "rejected"] }).notNull(),

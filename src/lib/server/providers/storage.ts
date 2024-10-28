@@ -26,7 +26,7 @@ class StorageProvider {
     }
 
     public async put(input: { name: string, extension: string, object: Buffer }): Promise<Result<{ storageKey: string }>> {
-        const key = input.name + "_" + genId(12) + (input.extension ? "." + input.extension : "")
+        const key = input.name + "_" + genId(12) + (input.extension ? "." + input.extension : "").replaceAll(" ", "_");
         this.logger.info(`putting object to storage with key '${key}'`);
 
         try {
