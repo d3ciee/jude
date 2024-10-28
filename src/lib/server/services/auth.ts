@@ -29,7 +29,7 @@ class AuthService {
 
         userAgent: string | null;
         ipAddress: string | null;
-    }): Promise<ServiceMethodOutput<{ userId: string; sessionId: string }>> {
+    }): Promise<any> {
         if (!AuthService.isEmailValid(params.email)) return {
             isSuccess: false,
             message: AuthService.ERR_INVALID_EMAIL

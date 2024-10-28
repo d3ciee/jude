@@ -5,8 +5,7 @@ export default {
     out: './.migrations',
     dialect: "turso",
     dbCredentials: {
-        authToken: process.env.DB_AUTH_TOKEN!,
-        url: process.env.DB_URL!,
+        url: "file:./.data/local.sqlite",
     },
     breakpoints: true
 } satisfies Config;
