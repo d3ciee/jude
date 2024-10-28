@@ -68,6 +68,43 @@ class ClaimsService {
 
     }
 
+
+    async getClaim(id: string): Promise<Result<{
+        claim: TClaim & { files: TFile[] };
+    }>> {
+        this.logger.info(`fetching claim '${id}' from db`)
+
+        try {
+            const claim = (await this.db.query.Claim.findFirst({
+                with: {
+                    files: true
+                }
+            }));
+            if (!claim) {
+                return {
+                    success: false,
+                    error: "Claim not found"
+                }
+            }
+
+            this.logger.info("claim fetched succesfully", { claims: claim, })
+
+            return {
+                success: true,
+                data: {
+                    claim,
+                }
+            }
+        } catch (e) {
+            this.logger.error("error getting claim from db", e)
+            return {
+                success: false,
+                error: "An unexpected error occurred.  Try again later"
+            }
+        }
+
+    }
+
     async createClaim(input: {
         submittedBy: TClaim["submittedBy"];
         membershipNumber: string;
