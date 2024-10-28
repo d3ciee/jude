@@ -48,19 +48,22 @@ const Claim = sqliteTable("types", {
     id: text("id").notNull().primaryKey(),
     createdAt: integer("created_at").notNull(),
     status: text("stage", { enum: ["pending", "approved", "rejected"] }).notNull(),
-    procesingStep: text("processing_step", { enum: ["parsing-files", "checking-rules", "<WILL_ADD_MORE_LATER,CAN_ONLY_THINK_OF_THESE>"] }),
+    procesingStep: text("processing_step", { enum: ["pending", "parsing-files", "checking-rules", "<WILL_ADD_MORE_LATER,CAN_ONLY_THINK_OF_THESE>"] }).notNull(),
     submittedBy: text("submitted_by", { enum: ["member", "provider"] }).notNull(),
-    submissionChannel: text("submission_channel", { enum: ["portal", "email", "app"] }),
+    submissionChannel: text("submission_channel", { enum: ["portal", "email", "app"] }).notNull(),
 })
+type TClaim = typeof Claim.$inferSelect
 
 const File = sqliteTable("files", {
     id: text("id").notNull().primaryKey(),
     createdAt: integer("created_at").notNull(),
     name: text("name").notNull(),
+    fileStorageKey: text("file_storage_key").notNull().unique(),
     size: integer("size").notNull(),
     type: text("type").notNull(),
     claimId: text("claim_id").notNull().references(() => Claim.id)
 })
+type TFile = typeof File.$inferSelect
 
 
 const fileRelations = relations(File, ({ one }) => ({
@@ -82,5 +85,9 @@ export {
     rulesRelations,
     sessionRelations,
     fileRelations,
-    claimRelations
+    claimRelations,
+
+    type TClaim,
+    type TFile
+
 }

@@ -4,6 +4,7 @@ import RulesService from "$lib/server/services/rules";
 import OpenAIService from "$lib/server/services/oai";
 import { createLogger, format, transports } from "winston";
 import genId from "$lib/utils/gen-id";
+import ClaimsService from "$lib/server/services/claims";
 
 export const handle: Handle = async ({ event, resolve }) => {
     const db = init();
@@ -38,6 +39,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.locals.logger = logger.child({ requestId });
     event.locals.services = {
         rules: new RulesService(requestContext, db, event.locals.logger),
+        claims: new ClaimsService(requestContext, db, event.locals.logger),
         oai: new OpenAIService(event.locals.logger)
     }
 

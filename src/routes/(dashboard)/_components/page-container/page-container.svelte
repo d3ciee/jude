@@ -2,11 +2,11 @@
     import type { Snippet } from "svelte";
 
     type Props = {
-        title: string;
+        title?: string;
         children: Snippet;
     };
 
-    const {title, children}:Props = $props();
+    const {title="", children}:Props = $props();
 </script>
 
 <div class="w-full h-screen flex flex-col">
