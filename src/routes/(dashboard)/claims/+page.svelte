@@ -9,10 +9,12 @@
   import PageContainer from "../_components/page-container";
   import Upload from "lucide-svelte/icons/upload";
   import { onDestroy } from "svelte";
+  import type { ClaimAnalysis, GptResponse } from "$lib/types";
+  import { toast } from "$lib/ui/sonner";
 
   let loading = false;
   let error: string | null = null;
-  let analysis: any = null;
+  let gptResponse: GptResponse | null = null;
   let fileName: string | null = null;
   let progressValue = 0;
   let progressInterval: ReturnType<typeof setInterval>;
@@ -58,12 +60,15 @@
           startProgressSimulation();
           return async ({ result }) => {
             stopProgressSimulation();
-            console.log(result);
             loading = false;
-            if (result.type === "success") {
-              analysis = result.data.analysis;
-            } else {
-              error = "Failed to analyze document";
+            console.log(result);
+            if (result.type === "success" && result.data?.success) {
+              gptResponse = result.data.data as GptResponse;
+            } 
+            else {
+              toast.error("Something went wrong", {
+                description: result.data?.error,
+            });
             }
           };
         }}
@@ -133,14 +138,14 @@
             </div>
           </div>
         </div>
-      {:else if analysis}
+      {:else if gptResponse!==null && gptResponse?.analysis !== null}
         <div class="space-y-6">
           <!-- Claimant Info -->
           <div>
             <h4 class="text-sm font-semibold mb-2">Claimant Information</h4>
             <div class="grid grid-cols-2 gap-2 text-sm">
-              <div>Name: {analysis.claimant.name}</div>
-              <div>Age: {analysis.claimant.age}</div>
+              <div>Name: {gptResponse.analysis.claimant.name}</div>
+              <div>Age: {gptResponse.analysis.claimant.age}</div>
             </div>
           </div>
 
@@ -148,11 +153,11 @@
           <div>
             <h4 class="text-sm font-semibold mb-2">Claim Details</h4>
             <div class="grid grid-cols-2 gap-2 text-sm">
-              <div>Date: {analysis.claim_details.submission_date}</div>
-              <div>Type: {analysis.claim_details.treatment_type}</div>
-              <div>Provider: {analysis.claim_details.healthcare_provider}</div>
-              <div>Amount: ${analysis.claim_details.claim_amount}</div>
-              <div>Location: {analysis.claim_details.location}</div>
+              <div>Date: {gptResponse.analysis.claimDetails.submissionDate}</div>
+              <div>Type: {gptResponse.analysis.claimDetails.treatmentType}</div>
+              <div>Provider: {gptResponse.analysis.claimDetails.healthcareProvider}</div>
+              <div>Amount: ${gptResponse.analysis.claimDetails.claimAmount}</div>
+              <div>Location: {gptResponse.analysis.claimDetails.location}</div>
             </div>
           </div>
 
@@ -163,16 +168,16 @@
               <div class="flex items-center gap-2">
                 <div>Trust Score:</div>
                 <Progress
-                  value={analysis.fraud_detection.trustability_score}
+                  value={gptResponse.analysis.fraudDetection.trustabilityScore}
                   class="w-32"
                 />
                 <span class="text-sm"
-                  >{analysis.fraud_detection.trustability_score}%</span
+                  >{gptResponse.analysis.fraudDetection.trustabilityScore}%</span
                 >
               </div>
-              {#if analysis.fraud_detection.flags.length > 0}
+              {#if gptResponse.analysis.fraudDetection.flags.length > 0}
                 <div class="flex gap-2 flex-wrap">
-                  {#each analysis.fraud_detection.flags as flag}
+                  {#each gptResponse.analysis.fraudDetection.flags as flag}
                     <Badge variant="destructive">{flag}</Badge>
                   {/each}
                 </div>
@@ -181,13 +186,13 @@
           </div>
 
           <!-- Rule Violations -->
-          {#if analysis.rule_violations.length > 0}
+          {#if gptResponse.analysis.ruleViolations.length > 0}
             <div>
               <h4 class="text-sm font-semibold mb-2">Rule Violations</h4>
               <div class="space-y-2">
-                {#each analysis.rule_violations as violation}
+                {#each gptResponse.analysis.ruleViolations as violation}
                   <Alert variant="destructive">
-                    <AlertTitle>{violation.rule.name}</AlertTitle>
+                    <AlertTitle>{violation.rule}</AlertTitle>
                     <AlertDescription>{violation.description}</AlertDescription>
                   </Alert>
                 {/each}
@@ -200,12 +205,12 @@
             <h4 class="text-sm font-semibold mb-2">Processing Metrics</h4>
             <div class="grid grid-cols-2 gap-2 text-sm">
               <div>
-                Est. Processing Time: {analysis.metrics.estimated_payout_time}
+                Est. Processing Time: {gptResponse.analysis.metrics.estimatedPayoutTime}
               </div>
               <div>
-                Potential Savings: ${analysis.metrics.potential_savings}
+                Potential Savings: ${gptResponse.analysis.metrics.potentialSavings} 
               </div>
-              {#if analysis.metrics.human_intervention_required}
+              {#if gptResponse.analysis.metrics.humanInterventionRequired}
                 <div class="col-span-2">
                   <Badge>Requires Manual Review</Badge>
                 </div>

@@ -17,6 +17,7 @@
     import { toast } from "$lib/ui/sonner";
     import type { Rule } from "$lib/types";
     import { Switch } from "$lib/ui/switch";
+    
     import { Trash2 } from "lucide-svelte";
     import type { SubmitFunction } from "./$types.js";
     import { enhance } from "$app/forms";

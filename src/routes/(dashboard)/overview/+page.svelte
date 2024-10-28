@@ -24,7 +24,7 @@
 
 {#snippet KpiCard({title, icon, value, previousValue}:any)}
 <Card.Root>
-    <Card.Header
+    <Card.Header    
         class="flex flex-row items-center justify-between space-y-0 pb-1 p-4"
     >
         <Card.Title class="text-sm font-medium"

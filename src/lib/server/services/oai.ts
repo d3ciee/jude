@@ -1,4 +1,5 @@
 import { OPENAI_API_KEY, OPENAI_ASSISTANT_ID } from '$env/static/private';
+import type { GptResponse } from '$lib/types';
 import { OpenAI, toFile } from 'openai';
 import type winston from 'winston';
 
@@ -56,21 +57,49 @@ class OpenAIService {
         }
     }
 
-    private async waitForRunCompletion(threadId: string, runId: string) {
-        let run = await this.client.beta.threads.runs.retrieve(threadId, runId);
+    private async waitForRunCompletion(threadId: string, runId: string): Promise<Result<GptResponse>> {
+
+        const retrieveRun = async () => this.client.beta.threads.runs.retrieve(threadId, runId);
+        const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+        let run = await retrieveRun();
 
         while (run.status === 'queued' || run.status === 'in_progress') {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            run = await this.client.beta.threads.runs.retrieve(threadId, runId);
+            await sleep(1000);
+            run = await retrieveRun();
         }
 
-        if (run.status === 'completed') {
-            const messages = await this.client.beta.threads.messages.list(threadId);
-            return messages.data[0].content[0].type === 'text' ? messages.data[0].content[0].text : null;
-        } else {
-            throw new Error(`Run failed with status code: ${run.status}`);
+        if (run.status !== 'completed') {
+            return {
+                success: false,
+                error: `Run failed with status code: ${run.status}`
+            };
+        }
+
+        const messages = await this.client.beta.threads.messages.list(threadId);
+        const response = messages.data[0].content[0].type === 'text' ? messages.data[0].content[0].text.value : null;
+
+        if (!response) {
+            return {
+                success: false,
+                error: 'No response from OpenAI',
+            };
+        }
+
+        try {
+            const parsedResponse: GptResponse = JSON.parse(response);
+            return {
+                success: true,
+                data: parsedResponse
+            };
+        } catch (error) {
+            return {
+                success: false,
+                error: 'Failed to parse response as GptResponse'
+            };
         }
     }
+
 }
 
 export default OpenAIService;
