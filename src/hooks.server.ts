@@ -7,6 +7,7 @@ import genId from "$lib/utils/gen-id";
 import ClaimsService from "$lib/server/services/claims";
 
 export const handle: Handle = async ({ event, resolve }) => {
+
     const db = init();
     const logger = createLogger({
         level: 'debug',
