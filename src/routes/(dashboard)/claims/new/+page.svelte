@@ -6,7 +6,7 @@
   import { Alert, AlertDescription, AlertTitle } from "$lib/ui/alert";
   import { Badge } from "$lib/ui/badge";
   import { Skeleton } from "$lib/ui/skeleton";
-  import PageContainer from "../_components/page-container";
+  import PageContainer from "../../_components/page-container";
   import Upload from "lucide-svelte/icons/upload";
   import { onDestroy } from "svelte";
 
@@ -61,7 +61,7 @@
             console.log(result);
             loading = false;
             if (result.type === "success") {
-              analysis = result.data.analysis;
+              analysis = result?.data?.analysis;
             } else {
               error = "Failed to analyze document";
             }

@@ -12,11 +12,6 @@
 
     import * as DropdownMenu from "$lib/ui/dropdown-menu";
     import { Button } from "$lib/ui/button";
-
-    import { Input } from "$lib/ui/input";
-    import Inbox from "lucide-svelte/icons/inbox";
-    import ChartBar from "lucide-svelte/icons/chart-bar";
-    import PenTool from "lucide-svelte/icons/pen-tool";
     import PenLine from "lucide-svelte/icons/pen-line";
 
     let accounts = [
@@ -27,15 +22,15 @@
         },
     ];
     let isCollapsed = false;
-    
+
     // Initialize from localStorage
-    if (typeof window !== 'undefined') {
-        isCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    if (typeof window !== "undefined") {
+        isCollapsed = localStorage.getItem("sidebarCollapsed") === "true";
     }
 
     // Update localStorage when state changes
-    $: if (typeof window !== 'undefined') {
-        localStorage.setItem('sidebarCollapsed', isCollapsed.toString());
+    $: if (typeof window !== "undefined") {
+        localStorage.setItem("sidebarCollapsed", isCollapsed.toString());
     }
 </script>
 

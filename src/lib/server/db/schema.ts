@@ -44,6 +44,13 @@ const rulesRelations = relations(Rule, ({ one }) => ({
     })
 }))
 
+const Claim = sqliteTable("types", {
+    id: text("id").notNull().primaryKey(),
+    name: text("name").notNull().unique(),
+    active: integer({ mode: 'boolean' }).notNull(),
+    createdAt: integer("created_at").notNull(),
+    createdBy: text("created_by").notNull().references(() => User.id)
+})
 
 
 export {
