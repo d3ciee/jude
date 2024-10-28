@@ -1,11 +1,12 @@
 import type { Config } from 'drizzle-kit';
 
 export default {
-    schema: './src/lib/infra/db/schema.ts',
+    schema: './src/lib/server/db/schema.ts',
     out: './.migrations',
     dialect: "turso",
     dbCredentials: {
-        url: "file:./.data/local.sqlite",
+        authToken: process.env.DB_AUTH_TOKEN!,
+        url: process.env.DB_URL!,
     },
     breakpoints: true
 } satisfies Config;

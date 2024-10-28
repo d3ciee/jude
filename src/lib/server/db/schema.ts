@@ -46,17 +46,41 @@ const rulesRelations = relations(Rule, ({ one }) => ({
 
 const Claim = sqliteTable("types", {
     id: text("id").notNull().primaryKey(),
-    name: text("name").notNull().unique(),
-    active: integer({ mode: 'boolean' }).notNull(),
     createdAt: integer("created_at").notNull(),
-    createdBy: text("created_by").notNull().references(() => User.id)
+    status: text("stage", { enum: ["pending", "approved", "rejected"] }).notNull(),
+    procesingStep: text("processing_step", { enum: ["parsing-files", "checking-rules", "<WILL_ADD_MORE_LATER,CAN_ONLY_THINK_OF_THESE>"] }),
+    submittedBy: text("submitted_by", { enum: ["member", "provider"] }).notNull(),
+    submissionChannel: text("submission_channel", { enum: ["portal", "email", "app"] }),
 })
 
+const File = sqliteTable("files", {
+    id: text("id").notNull().primaryKey(),
+    createdAt: integer("created_at").notNull(),
+    name: text("name").notNull(),
+    size: integer("size").notNull(),
+    type: text("type").notNull(),
+    claimId: text("claim_id").notNull().references(() => Claim.id)
+})
+
+
+const fileRelations = relations(File, ({ one }) => ({
+    claim: one(Claim, {
+        fields: [File.claimId],
+        references: [Claim.id]
+    })
+}))
+const claimRelations = relations(Claim, ({ one, many }) => ({
+    files: many(File)
+}))
 
 export {
     User,
     Session,
     Rule,
+    Claim,
+    File,
     rulesRelations,
-    sessionRelations
+    sessionRelations,
+    fileRelations,
+    claimRelations
 }
