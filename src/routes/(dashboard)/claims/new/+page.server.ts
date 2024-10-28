@@ -11,8 +11,8 @@ export const actions = {
 
         const buffer = Buffer.from(await file.arrayBuffer());
 
-        const response = await locals.services.oai.analyzeDocument(buffer, file.name);
-        const analysis = JSON.parse(response?.value);
-        return { analysis };
+        const result = await locals.services.oai.analyzeDocument(buffer, file.name);
+
+        return { result };
     }
 }
