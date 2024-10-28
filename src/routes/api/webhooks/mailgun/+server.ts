@@ -14,7 +14,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 
     const files = await Promise.all(Array.from({ length: attachmentCount }, async (_, i) => {
-        const file = formData.get(`attachment-${i}`) as File;
+        const file = formData.get(`attachment-${i + 1}`) as File;
 
         return {
             name: file.name,
@@ -30,9 +30,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         membershipNumber,
         files
     })
-
-    console.log(result)
-
 
     return new Response();
 };
