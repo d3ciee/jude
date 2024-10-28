@@ -13,13 +13,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
 
     const files = await Promise.all(Array.from({ length: attachmentCount }, async (_, i) => {
-        const file = formData.get(`file-${i}`) as File;
+        const file = formData.get(`attachment-${i}`) as File;
 
         return {
             name: file.name,
             size: file.size,
             object: Buffer.from(await file.arrayBuffer()),
-            type: formData.get(`file-${i}-type`)?.toString()!,
+            type: "other",
         }
     }));
 
