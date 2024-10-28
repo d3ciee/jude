@@ -23,7 +23,10 @@
                                 ? "secondary"
                                 : "ghost"}
                             size="icon"
-                            class={cn("size-8")}
+                            class={cn(
+                                "size-8",
+                                route.path !== selected && "opacity-60",
+                            )}
                         >
                             <svelte:component
                                 this={route.icon}
@@ -50,10 +53,10 @@
                     href={route.path}
                     variant={route.path === selected ? "secondary" : "ghost"}
                     size="sm"
-                    class={cn("justify-start p-2", {
-                        "dark:bg-muted dark:hover:bg-muted dark:text-white dark:hover:text-white":
-                            route.path !== selected,
-                    })}
+                    class={cn(
+                        "justify-start p-2",
+                        route.path === selected && "!bg-gray-200",
+                    )}
                 >
                     <svelte:component
                         this={route.icon}
@@ -64,8 +67,7 @@
                     {#if route.label}
                         <span
                             class={cn("ml-auto", {
-                                "text-background dark:text-white":
-                                    route.path !== selected,
+                                "text-background": route.path !== selected,
                             })}
                         >
                             {route.label}

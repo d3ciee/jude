@@ -51,6 +51,8 @@ const Claim = sqliteTable("claim", {
     procesingStep: text("processing_step", { enum: ["pending", "parsing-files", "checking-rules", "<WILL_ADD_MORE_LATER,CAN_ONLY_THINK_OF_THESE>"] }).notNull(),
     submittedBy: text("submitted_by", { enum: ["member", "provider"] }).notNull(),
     submissionChannel: text("submission_channel", { enum: ["portal", "email", "app"] }).notNull(),
+
+    metadata: text("metadata", { mode: "json" })
 })
 type TClaim = typeof Claim.$inferSelect
 
@@ -61,6 +63,11 @@ const File = sqliteTable("files", {
     fileStorageKey: text("file_storage_key").notNull().unique(),
     size: integer("size").notNull(),
     type: text("type").notNull(),
+
+    // @manasseh: we can fill this with the parsed data so i can use it in the claims page
+    // Just make it a Record<string,primitive> so i can Object.entries it inside the claims page
+    parsedData: text("parsed_data", { mode: "json" }),
+
     claimId: text("claim_id").notNull().references(() => Claim.id)
 })
 type TFile = typeof File.$inferSelect

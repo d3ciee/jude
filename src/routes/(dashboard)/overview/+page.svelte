@@ -1,14 +1,6 @@
 <script lang="ts">
-    import Activity from "lucide-svelte/icons/activity";
     import ArrowUpRight from "lucide-svelte/icons/arrow-up-right";
-    import CreditCard from "lucide-svelte/icons/credit-card";
-    import DollarSign from "lucide-svelte/icons/dollar-sign";
     import Clock from "lucide-svelte/icons/clock";
-
-    import { Chart, Svg, Axis,Spline,Tooltip,Text,Highlight } from 'layerchart';
-
-    import Users from "lucide-svelte/icons/users";
-
 
     import * as Card from "$lib/ui/card";
     import * as Table from "$lib/ui/table";
@@ -17,8 +9,68 @@
     import * as Avatar from "$lib/ui/avatar";
     import PageContainer from "../_components/page-container";
     import { Medal, Star, TriangleAlert } from "lucide-svelte";
+    import { onMount } from "svelte";
+
+    import 'chartjs-adapter-luxon';
+
+    import {
+		Chart,
+		TimeScale,
+        LineController,
+        LineElement,
+		CategoryScale,
+		LinearScale,
+		Tooltip,
+        PointElement
+	} from 'chart.js';
 
     const {data} = $props();
+
+    let canvas: HTMLCanvasElement;
+	let chart: Chart<any> | undefined = undefined;
+
+    onMount(()=>{
+        const data = {
+        labels: Array.from({ length: 7 }, (_, i) => `Day ${i + 1}`),
+        datasets: [{
+            label: 'My First Dataset',
+            data: [65, 59, 80, 81, 56, 55, 40],
+            fill: false,
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+        }]
+        };
+
+        Chart.register(LineController, LineElement, CategoryScale, LinearScale, TimeScale, Tooltip,PointElement);
+		const ctx = canvas.getContext('2d')!;
+
+        chart = new Chart(ctx, {
+            type: 'line',
+            data: data,
+            options: {
+                font: {
+                    family: 'Nunito, sans-serif',
+                    weight: 'bold'
+                },
+                maintainAspectRatio: false,
+                borderColor:"transparent",
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        ticks:{
+                            font:{}
+                        }
+                    },
+                    x: {
+                        
+                        ticks:{
+                            font:{}
+                        }
+                    }
+                }
+            }
+        });
+    })
 
 </script>
 
@@ -61,7 +113,10 @@
                 {@render KpiCard({title:"User satisfaction score", icon: Star, value:"4.9/5", previousValue:"4.5"})}
             </div>
             <div class="h-[300px] p-4 border rounded">
-                TODO: add chart here
+                
+                    <canvas id="line-chart" class="w-full" bind:this={canvas} ></canvas>
+                  
+                  
               </div>
               
             <div class="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">

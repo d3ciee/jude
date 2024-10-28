@@ -15,6 +15,13 @@
       "when": 1730116013009,
       "tag": "0001_condemned_sprite",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1730129683045,
+      "tag": "0002_fluffy_whirlwind",
+      "breakpoints": true
     }
   ]
 }

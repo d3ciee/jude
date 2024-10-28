@@ -5,8 +5,12 @@ import OpenAIService from "$lib/server/services/oai";
 import { createLogger, format, transports } from "winston";
 import genId from "$lib/utils/gen-id";
 import ClaimsService from "$lib/server/services/claims";
+import { User } from "$lib/server/db/schema";
+
+import bcrypt from "bcryptjs";
 
 export const handle: Handle = async ({ event, resolve }) => {
+
     const db = init();
     const logger = createLogger({
         level: 'debug',
@@ -17,6 +21,15 @@ export const handle: Handle = async ({ event, resolve }) => {
     });
 
     const userId = "uuid123";
+
+    // await db.insert(User).values({
+    //     id: userId,
+    //     email: "manasseh@gmail.com",
+    //     name: "Manasseh",
+    //     createdAt: Date.now(),
+    //     passwordHash: bcrypt.hashSync("password", 10)
+    // }).execute();
+
     const requestId = genId(16);
 
     const requestContext: App.RequestContext = {
