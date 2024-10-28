@@ -68,7 +68,7 @@ class OpenAIService {
             const messages = await this.client.beta.threads.messages.list(threadId);
             return messages.data[0].content[0].type === 'text' ? messages.data[0].content[0].text : null;
         } else {
-            throw new Error(`Run failed with status: ${run.status}`);
+            throw new Error(`Run failed with status code: ${run.status}`);
         }
     }
 }

@@ -1,4 +1,4 @@
-// Entity Types
+
 export interface User {
     id: string;
     email: string;
@@ -29,10 +29,42 @@ export type Rule = {
     };
 }
 
-// DTOs
 export interface CreateRule {
     name: string;
     description: string;
+}
+
+
+export interface ClaimAnalysis {
+    isValid: boolean;
+    analysis: {
+        claimant: {
+            name: string;
+            age: number;
+        };
+        claimDetails: {
+            submissionDate: string;
+            treatmentType: string;
+            healthcareProvider: string;
+            claimAmount: number;
+            location: string;
+            supportingDocuments: string;
+        };
+        fraudDetection: {
+            trustabilityScore: number;
+            flags: string[];
+        };
+        ruleViolations: {
+            rule: string;
+            description: string;
+        }[];
+        metrics: {
+            estimatedPayoutTime: string;
+            missingInformation: string[];
+            potentialSavings: number;
+            humanInterventionRequired: boolean;
+        };
+    } | null;
 }
 
 export type GetListOfRules = {
