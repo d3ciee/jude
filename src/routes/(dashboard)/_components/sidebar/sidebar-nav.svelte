@@ -64,8 +64,7 @@
                     {#if route.label}
                         <span
                             class={cn("ml-auto", {
-                                "text-background dark:text-white":
-                                    route.path !== selected,
+                                "text-background": route.path !== selected,
                             })}
                         >
                             {route.label}

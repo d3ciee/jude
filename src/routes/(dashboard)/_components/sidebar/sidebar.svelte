@@ -34,11 +34,11 @@
     }
 </script>
 
-<div class="flex flex-col border-r h-full gap-2 bg-muted/40 sticky">
+<div class="flex flex-col border-r h-full gap-2 bg-muted sticky">
     <div
         class={cn(
-            "flex h-[52px] items-center justify-center border-b ",
-            isCollapsed ? "h-[52px]" : "px-2 w-64",
+            "flex h-[52px] items-center justify-center",
+            isCollapsed ? "h-[52px]" : "px-3 w-64",
         )}
     >
         <DropdownMenu.Root>
@@ -63,7 +63,7 @@
                     )}
                 >
                     <div
-                        class="text-sm font-medium leading-none text-left w-full"
+                        class="text-sm font-medium leading-none text-left w-full text-secondary-foreground"
                     >
                         Decent Femai
                     </div>
@@ -74,7 +74,10 @@
                     </div>
                 </span>
                 <ChevronsUpDown
-                    class={cn("w-4 h-4", isCollapsed && "hidden")}
+                    class={cn(
+                        "w-4 h-4 text-muted-foreground",
+                        isCollapsed && "hidden",
+                    )}
                 />
             </DropdownMenu.Trigger>
 
@@ -136,8 +139,11 @@
             class={cn("w-full h-8 text-sm", isCollapsed && "size-8")}
             size={isCollapsed ? "icon" : "sm"}
         >
-            <Plus class="w-4 h-4" />
-            <span class="ml-2" class:hidden={isCollapsed}>New application</span>
+            <Plus class="w-4 h-4 text-primary-foreground opacity-80" />
+            <span
+                class="ml-2 text-primary-foreground"
+                class:hidden={isCollapsed}>New application</span
+            >
         </Button>
     </div>
 
@@ -161,7 +167,6 @@
             },
         ]}
     />
-    <Separator />
 
     <div class="flex-1 w-full"></div>
     <div
@@ -186,7 +191,7 @@
             class={cn("w-8 h-8", isCollapsed ? "ml-2.5" : "-mr-1.5")}
             variant="ghost"
         >
-            <PanelLeftClose class="w-4 h-4" />
+            <PanelLeftClose class="w-4 h-4 text-foreground" />
         </Button>
     </div>
 </div>
