@@ -78,6 +78,11 @@
                     </Select.Root>
                 </div>  
         
+                <div class="grid grid-cols-4 items-center gap-4">
+                    <Label for="name" class="text-right">Member ID</Label>
+                    <Input name="membership-number" class="w-full"/>
+                </div>  
+
                 {#each files as file,i (i)}
                     <div class="grid grid-cols-4 items-center gap-4">
                         <Label for="file-{i}" class="text-right"
