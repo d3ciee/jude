@@ -29,10 +29,11 @@ export const actions = {
 
         const formData = await request.formData();
         const submittedBy = formData.get('submitted-by') as TClaim["submittedBy"];
+        const membershipNumber = formData.get("membership-number") as string;
         const numberOfFiles = Number(formData.get('number-of-files'));
 
-        if (!submittedBy || !Claim.submittedBy.enumValues.includes(submittedBy)) {
-            return fail(400, { message: 'Invalid submitter provided' });
+        if (!submittedBy || !Claim.submittedBy.enumValues.includes(submittedBy) || !membershipNumber) {
+            return fail(400, { message: 'Invalid submition provided' });
         }
         if (!numberOfFiles) {
             return fail(400, { message: 'No files uploaded' });
@@ -44,19 +45,20 @@ export const actions = {
             return {
                 name: file.name,
                 size: file.size,
-                object: await file.arrayBuffer(),
-                type: formData.get(`file-${i}-type`),
+                object: Buffer.from(await file.arrayBuffer()),
+                type: formData.get(`file-${i}-type`)?.toString() || "other",
             }
         }));
 
         const result = await locals.services.claims.createClaim({
             submittedBy,
             submissionChannel: 'portal',
+            membershipNumber,
             files
         })
 
         if (!result.success) {
-            return fail(500, { message: result.message });
+            return fail(500, { message: result.error });
         }
 
         return;

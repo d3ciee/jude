@@ -51,7 +51,7 @@ const Claim = sqliteTable("claim", {
     procesingStep: text("processing_step", { enum: ["pending", "parsing-files", "checking-rules", "<WILL_ADD_MORE_LATER,CAN_ONLY_THINK_OF_THESE>"] }).notNull(),
     submittedBy: text("submitted_by", { enum: ["member", "provider"] }).notNull(),
     submissionChannel: text("submission_channel", { enum: ["portal", "email", "app"] }).notNull(),
-
+    membershipNumber: text("membership_number").notNull(),
     metadata: text("metadata", { mode: "json" })
 })
 type TClaim = typeof Claim.$inferSelect
