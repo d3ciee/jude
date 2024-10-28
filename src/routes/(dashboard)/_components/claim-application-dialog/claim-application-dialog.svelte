@@ -61,6 +61,11 @@
             <input type="hidden" name="number-of-files" value={files.length}/>
             <div class="grid gap-4 py-4">
                 <div class="grid grid-cols-4 items-center gap-4">
+                    <Label for="name" class="text-right">Member ID</Label>
+                    <Input name="membership-number" required class="w-full"/>
+                </div>  
+
+                <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="name" class="text-right">Submitted by</Label>
                     <Select.Root>
                         <Select.Trigger class="col-span-3">
@@ -78,10 +83,6 @@
                     </Select.Root>
                 </div>  
         
-                <div class="grid grid-cols-4 items-center gap-4">
-                    <Label for="name" class="text-right">Member ID</Label>
-                    <Input name="membership-number" class="w-full"/>
-                </div>  
 
                 {#each files as file,i (i)}
                     <div class="grid grid-cols-4 items-center gap-4">
