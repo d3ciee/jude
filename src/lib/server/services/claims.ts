@@ -70,6 +70,7 @@ class ClaimsService {
 
     async createClaim(input: {
         submittedBy: TClaim["submittedBy"];
+        membershipNumber: string;
         submissionChannel: TClaim["submissionChannel"];
         files: { name: string, size: number, type: string, object: Buffer }[];
     }): Promise<Result<{ id: string }>> {
@@ -85,6 +86,7 @@ class ClaimsService {
                     id: claimId,
                     status: "pending",
                     submittedBy: input.submittedBy,
+                    membershipNumber: input.membershipNumber,
                     procesingStep: "pending",
                     submissionChannel: input.submissionChannel,
                     createdAt: Date.now(),
