@@ -76,6 +76,9 @@ class ClaimsService {
 
         try {
             const claim = (await this.db.query.Claim.findFirst({
+                where(f, { eq }) {
+                    return eq(f.id, id)
+                },
                 with: {
                     files: true
                 }

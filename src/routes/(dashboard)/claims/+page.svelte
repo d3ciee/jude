@@ -1,25 +1,16 @@
 <script lang="ts">
     import PageContainer from "../_components/page-container";
 
-    import Ellipsis from "lucide-svelte/icons/ellipsis";
     import { Badge } from "$lib/ui/badge";
     import { Button } from "$lib/ui/button";
     import * as Card from "$lib/ui/card";
-    import * as Dialog from "$lib/ui/dialog";
-    import { Input } from "$lib/ui/input";
-    import { Label } from "$lib/ui/label";
-    import * as DropdownMenu from "$lib/ui/dropdown-menu";
+    
     import * as Table from "$lib/ui/table";
 
     import CircleFadingPlus from "lucide-svelte/icons/circle-fading-plus";
     import Loader from "lucide-svelte/icons/loader";
-    import { Textarea } from "$lib/ui/textarea";
     import { toast } from "$lib/ui/sonner";
-    import type { Rule } from "$lib/types";
-    import { Switch } from "$lib/ui/switch";
-    import { Trash2 } from "lucide-svelte";
     import type { SubmitFunction } from "./$types.js";
-    import { enhance } from "$app/forms";
     import { invalidate, invalidateAll } from "$app/navigation";
     import ClaimApplicationDialog from "../_components/claim-application-dialog";
     import type { TClaim } from "$lib/server/db/schema";
@@ -116,6 +107,7 @@
                                 <Table.Head>ID</Table.Head>
                                 <Table.Head>Approval status</Table.Head>
                                 <Table.Head>Processing step</Table.Head>
+                                <Table.Head>Membership Number</Table.Head>
                                 <Table.Head>Submitted by</Table.Head>
                                 <Table.Head>Submission channel</Table.Head>
                                 <Table.Head>Number of files</Table.Head>
@@ -153,6 +145,9 @@
                                                 {claim.procesingStep}
                                             </Badge>
                                         </Table.Cell>
+                                        <Table.Cell
+                                        >{claim.membershipNumber}</Table.Cell
+                                    >
                                         <Table.Cell
                                             >{claim.submittedBy}</Table.Cell
                                         >

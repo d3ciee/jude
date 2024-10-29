@@ -4,12 +4,15 @@
     import X from "lucide-svelte/icons/x";
 
     import * as Tabs from "$lib/ui/tabs";
+
     import * as Accordion from "$lib/ui/accordion";
 
     import { Button } from "$lib/ui/button";
     import type { TClaim, TFile } from "$lib/server/db/schema";
     import { toast } from "$lib/ui/sonner";
     import formatFileSize from "$lib/utils/format-file-size";
+    import PdfViewer from "./_components/pdf-viewer";
+    import { ScrollArea } from "$lib/ui/scroll-area";
 
     const { data } = $props();
     let claim: (TClaim & { files: TFile[] }) | null = $state(null);
@@ -55,7 +58,7 @@
                     <Tabs.Content value="attached-files" class="mt-3">
                         <Accordion.Root class="w-full">
                             {#each claim.files as file, i}
-                                <Accordion.Item value="item-1">
+                                <Accordion.Item value="item-{i}">
                                     <Accordion.Trigger class="flex">
                                         <span class="flex-1 text-left px-6">
                                             {i + 1}. {file.name} ({formatFileSize(
@@ -70,20 +73,49 @@
                                     </Accordion.Trigger>
                                     <Accordion.Content class="min-h-max">
                                         <div
-                                            class="grid gap-6 grid-cols-3 h-full w-full bg-red-200"
+                                            class="grid gap-6 grid-cols-3 h-full w-full"
                                         >
                                             <div class="col-span-2">
                                                 {#if file.name.endsWith(".pdf")}
-                                                    <iframe
-                                                        class="w-full bg-secondary aspect-video"
-                                                        title={file.name}
-                                                        src="https://pub-3d4d614658744eaaba570c12de083c1c.r2.dev/{file.fileStorageKey}"
-                                                        frameborder="0"
-                                                    ></iframe>
+                                                    <PdfViewer
+                                                        fileName={file.fileStorageKey}
+                                                    />
+                                                {:else if ["png", "gif", "jpeg", "jpg", "webp"].includes(file.name.split(".")[1])}
+                                                    <img
+                                                        src={`https://pub-3d4d614658744eaaba570c12de083c1c.r2.dev/${file.fileStorageKey}`}
+                                                        alt={file.name}
+                                                        class="w-full bg-secondary aspect-video object-contain"
+                                                    />
+                                                {:else}
+                                                    <div
+                                                        class="flex items-center justify-center w-full bg-secondary aspect-video"
+                                                    >
+                                                        <Paperclip
+                                                            class="h-12 w-12 text-primary"
+                                                        />
+                                                    </div>
                                                 {/if}
                                             </div>
                                             <div class="col-span-1">
-                                                extracted data goes here
+                                                <h3
+                                                    class="text-lg font-semibold mb-2"
+                                                >
+                                                    Extracted Data
+                                                </h3>
+                                                <ScrollArea class="h-full">
+                                                    <dl
+                                                        class="grid grid-cols-2 gap-2 text-sm"
+                                                    >
+                                                        {#each Object.entries( { "This is where @manasseh": "comes in", "File Name": file.name, "File Size": formatFileSize(file.size), "Created At": new Date(file.createdAt).toLocaleDateString() }, ) as [key, value]}
+                                                            <dt
+                                                                class="font-medium"
+                                                            >
+                                                                {key}:
+                                                            </dt>
+                                                            <dd>{value}</dd>
+                                                        {/each}
+                                                    </dl>
+                                                </ScrollArea>
                                             </div>
                                         </div>
                                     </Accordion.Content>
