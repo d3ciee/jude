@@ -1,0 +1,1 @@
+ALTER TABLE `files` RENAME COLUMN "parsed_data" TO "extracted_data";

@@ -66,7 +66,7 @@ const File = sqliteTable("files", {
 
     // @manasseh: we can fill this with the parsed data so i can use it in the claims page
     // Just make it a Record<string,primitive> so i can Object.entries it inside the claims page
-    parsedData: text("parsed_data", { mode: "json" }),
+    extractedData: text("extracted_data", { mode: "json" }),
 
     claimId: text("claim_id").notNull().references(() => Claim.id)
 })
