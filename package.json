@@ -63,6 +63,9 @@
 		"layerchart": "^0.54.1",
 		"nanoid": "^5.0.7",
 		"openai": "^4.68.4",
+		"pdfjs-dist": "^4.7.76",
+		"svelte-pdf": "^1.0.20",
+		"svelte-pdf-simple": "^2.0.0",
 		"tailwind-merge": "^2.5.4",
 		"tailwind-variants": "^0.2.1",
 		"winston": "^3.15.0"

@@ -33,6 +33,15 @@ class StorageProvider {
             const putObjectCommand = new PutObjectCommand({
                 Bucket: this.bucketName,
                 Key: key,
+                ContentType: {
+                    "pdf": "application/pdf",
+                    "doc": "application/msword",
+                    "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                    "jpg": "image/jpeg",
+                    "jpeg": "image/jpeg",
+                    "png": "image/png",
+                    "gif": "image/gif",
+                }[input.extension] || "application/octet-stream",
                 Body: input.object,
             });
 
