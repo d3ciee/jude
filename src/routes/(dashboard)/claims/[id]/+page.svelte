@@ -48,7 +48,12 @@
                         <Tabs.Trigger value="attached-files"
                             >Attached files</Tabs.Trigger
                         >
-                        <Tabs.Trigger value="section-3">Section 3</Tabs.Trigger>
+                        <Tabs.Trigger value="socail-analysis"
+                            >Social analysis</Tabs.Trigger
+                        >
+                        <Tabs.Trigger value="risk-analysis"
+                            >Risk analysis</Tabs.Trigger
+                        >
                         <Tabs.Trigger value="section-4">Section 4</Tabs.Trigger>
                     </Tabs.List>
 
