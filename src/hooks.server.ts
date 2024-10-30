@@ -8,6 +8,7 @@ import ClaimsService from "$lib/server/services/claims";
 import { User } from "$lib/server/db/schema";
 
 import bcrypt from "bcryptjs";
+import AuditService from "$lib/server/services/audit";
 
 export const handle: Handle = async ({ event, resolve }) => {
 
@@ -53,7 +54,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     event.locals.services = {
         rules: new RulesService(requestContext, db, event.locals.logger),
         claims: new ClaimsService(requestContext, db, event.locals.logger),
-        oai: new OpenAIService(event.locals.logger)
+        oai: new OpenAIService(event.locals.logger),
+        audit: new AuditService(db, event.locals.logger)
     }
 
     return await resolve(event);

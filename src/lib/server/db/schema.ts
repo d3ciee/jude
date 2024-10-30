@@ -73,6 +73,21 @@ const File = sqliteTable("files", {
 type TFile = typeof File.$inferSelect
 
 
+const AuditLog = sqliteTable("audit_log", {
+    id: text("id").notNull().primaryKey(),
+    createdAt: integer("created_at").notNull(),
+    userId: text("user_id").notNull().references(() => User.id),
+    action: text("action").notNull(),
+    details: text("details").notNull()
+})
+
+const auditLogRelations = relations(AuditLog, ({ one }) => ({
+    user: one(User, {
+        fields: [AuditLog.userId],
+        references: [User.id]
+    })
+}))
+
 const fileRelations = relations(File, ({ one }) => ({
     claim: one(Claim, {
         fields: [File.claimId],
@@ -89,7 +104,9 @@ export {
     Rule,
     Claim,
     File,
+    AuditLog,
     rulesRelations,
+    auditLogRelations,
     sessionRelations,
     fileRelations,
     claimRelations,

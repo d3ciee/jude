@@ -26,6 +26,7 @@ declare global {
 				rules: import("$lib/server/services/rules").default;
 				claims: import("$lib/server/services/claims").default;
 				oai: import("$lib/server/services/oai").default;
+				audit: import("$lib/server/services/audit").default;
 			}
 		}
 	}
