@@ -20,7 +20,7 @@ class EmailProvider {
                 text: input.text,
                 subject: input.subject,
                 to: input.to,
-                from: `CIMAS CLAIMS APPLICATIONS <cimas-claims@${MAILGUN_DOMAIN}`
+                from: `CIMAS CLAIMS APPLICATIONS <cimas-claims@${MAILGUN_DOMAIN}>`
             });
             if (result.status > 299) {
                 throw new Error("email not sent");
