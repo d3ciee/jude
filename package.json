@@ -45,7 +45,7 @@
 	},
 	"dependencies": {
 		"@ai-sdk/google": "^0.0.54",
-		"@aws-sdk/client-s3": "^3.679.0",
+		"@aws-sdk/client-s3": "^3.682.0",
 		"@fontsource/nunito": "^5.1.0",
 		"@libsql/client": "^0.14.0",
 		"@sveltejs/adapter-node": "^5.2.9",
@@ -62,6 +62,7 @@
 		"drizzle-orm": "^0.35.3",
 		"formidable": "^3.5.2",
 		"layerchart": "^0.54.1",
+		"mailgun.js": "^10.2.3",
 		"nanoid": "^5.0.7",
 		"openai": "^4.68.4",
 		"pdfjs-dist": "^4.7.76",

@@ -7,11 +7,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     formData.forEach((v, k) => console.log(v, k))
 
     const attachmentCount = Number(formData.get('attachment-count'))
+
     const messageBody = formData.get("body-plain")
 
     const submittedBy = "member";
     const membershipNumber = "M124fwW"
 
+    const email = formData.get("sender") as string;
 
     const files = await Promise.all(Array.from({ length: attachmentCount }, async (_, i) => {
         const file = formData.get(`attachment-${i + 1}`) as File;
@@ -30,6 +32,21 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         membershipNumber,
         files
     })
+
+    if (!result.success) {
+        const x = await locals.providers.email.sendEmail({
+            to: email,
+            subject: "Claim Submission Failed",
+            text: `There was an error submitting your claim. Please try again later.  For more information, contact us or go to https://jude-gold.vercel.app/member/${membershipNumber}`,
+        })
+    }
+
+    await locals.providers.email.sendEmail({
+        to: email,
+        subject: "Claim Submission Successful",
+        text: `Your claim has been submitted successfully.  For more information, or to track your claims progress, contact us or go to https://jude-gold.vercel.app/member/${membershipNumber}`,
+    })
+
 
     return new Response();
 };

@@ -28,6 +28,10 @@ declare global {
 				oai: import("$lib/server/services/oai").default;
 				audit: import("$lib/server/services/audit").default;
 			}
+			providers: {
+				storage: import("$lib/server/providers/storage").default;
+				email: import("$lib/server/providers/email").default;
+			}
 		}
 	}
 }

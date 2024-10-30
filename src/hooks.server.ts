@@ -9,6 +9,8 @@ import { User } from "$lib/server/db/schema";
 
 import bcrypt from "bcryptjs";
 import AuditService from "$lib/server/services/audit";
+import StorageProvider from "$lib/server/providers/storage";
+import EmailProvider from "$lib/server/providers/email";
 
 export const handle: Handle = async ({ event, resolve }) => {
 
@@ -55,7 +57,11 @@ export const handle: Handle = async ({ event, resolve }) => {
         rules: new RulesService(requestContext, db, event.locals.logger),
         claims: new ClaimsService(requestContext, db, event.locals.logger),
         oai: new OpenAIService(event.locals.logger),
-        audit: new AuditService(db, event.locals.logger)
+        audit: new AuditService(db, event.locals.logger),
+    }
+    event.locals.providers = {
+        storage: new StorageProvider(event.locals.logger),
+        email: new EmailProvider(event.locals.logger)
     }
 
     return await resolve(event);
