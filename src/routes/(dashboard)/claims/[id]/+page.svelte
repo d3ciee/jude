@@ -34,10 +34,10 @@
             <h1
                 class="text-lg font-semibold leading-none tracking-tight space-y-1.5"
             >
-                Claims
+                Claim with ID: {claim?.id} for member {claim?.membershipNumber}
             </h1>
             <p class="text-muted-foreground text-sm">
-                Manage and view claims that you have received
+                Manage and view claim: {claim?.id}
             </p>
         </div>
         <div class="w-full h-full flex">
@@ -85,7 +85,9 @@
                                                     <PdfViewer
                                                         fileName={file.fileStorageKey}
                                                     />
-                                                {:else if ["png", "gif", "jpeg", "jpg", "webp"].includes(file.name.split(".")[1])}
+                                                {:else if ["png", "gif", "jpeg", "jpg", "webp"].includes(file.name
+                                                        .split(".")[1]
+                                                        .toLowerCase())}
                                                     <img
                                                         src={`https://pub-3d4d614658744eaaba570c12de083c1c.r2.dev/${file.fileStorageKey}`}
                                                         alt={file.name}
@@ -111,7 +113,7 @@
                                                     <dl
                                                         class="grid grid-cols-2 gap-2 text-sm"
                                                     >
-                                                        {#each Object.entries( { "This is where @manasseh": "comes in", "File Name": file.name, "File Size": formatFileSize(file.size), "Created At": new Date(file.createdAt).toLocaleDateString() }, ) as [key, value]}
+                                                        {#each Object.entries(file.extractedData ? file.extractedData : { "File Name": file.name, "File Size": formatFileSize(file.size), "Created At": new Date(file.createdAt).toLocaleDateString() }) as [key, value]}
                                                             <dt
                                                                 class="font-medium"
                                                             >

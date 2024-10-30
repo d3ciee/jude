@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, numeric } from "drizzle-orm/sqlite-core";
 
 const User = sqliteTable("user", {
     id: text("id").notNull().primaryKey(),
@@ -67,6 +67,7 @@ const File = sqliteTable("files", {
     // @manasseh: we can fill this with the parsed data so i can use it in the claims page
     // Just make it a Record<string,primitive> so i can Object.entries it inside the claims page
     extractedData: text("extracted_data", { mode: "json" }),
+    confidence: numeric("confidence"),
 
     claimId: text("claim_id").notNull().references(() => Claim.id)
 })

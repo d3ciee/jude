@@ -50,6 +50,13 @@
       "when": 1730293572223,
       "tag": "0006_kind_oracle",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1730315577729,
+      "tag": "0007_red_dakota_north",
+      "breakpoints": true
     }
   ]
 }

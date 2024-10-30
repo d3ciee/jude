@@ -5,6 +5,7 @@ import genId from "$lib/utils/gen-id";
 import StorageProvider from "../providers/storage";
 import AuditService from "./audit";
 import { count } from "drizzle-orm";
+import OpenAIService from "./oai";
 
 class ClaimsService {
     private db: DB;
@@ -15,6 +16,8 @@ class ClaimsService {
     private storageProvider: StorageProvider;
     private requestContext: App.RequestContext;
 
+    private oaiService: OpenAIService;
+
     public static GET_LIST_OF_CLAIMS_DEFAULT_LIMIT = 10;
 
     constructor(context: App.RequestContext, db: DB, logger: winston.Logger) {
@@ -22,6 +25,7 @@ class ClaimsService {
         this.db = db;
 
         this.logger = logger.child({ service: "claims" });
+        this.oaiService = new OpenAIService(logger);
         this.auditService = new AuditService(db, logger);
         this.storageProvider = new StorageProvider(this.logger);
     }
@@ -119,8 +123,6 @@ class ClaimsService {
 
         const claimId = genId();
         try {
-            // using batch api as im not too sure if 
-            // the transaction api is supported for libsql
             await this.db.batch([
                 this.db.insert(Claim).values({
                     id: claimId,
@@ -139,17 +141,23 @@ class ClaimsService {
                             object: file.object,
                         })
                         if (!s.success) throw new Error(s.error);
+
+                        const ocr = await this.oaiService.performOCR(file.object, file.name);
+                        if (!ocr.success) throw new Error("ocr failed")
                         return {
                             id: genId(),
                             claimId: claimId,
                             fileStorageKey: s.data.storageKey,
-                            name: file.name,
+                            name: ocr.data.documentType,
+                            extractedData: ocr.data.extractedData,
                             size: file.size,
+                            confidence: ocr.data.confidenceLevel.toString(),
                             type: file.type,
                             createdAt: Date.now(),
                         }
                     })))
             ])
+
 
 
             this.auditService.log({
@@ -173,6 +181,9 @@ class ClaimsService {
             };
         }
     }
+
+
+
 }
 
 export default ClaimsService
