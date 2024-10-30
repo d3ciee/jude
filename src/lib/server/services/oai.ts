@@ -1,49 +1,56 @@
-import { JUDE, JUDE_EYE, JUDE_SPECTRE, JUDE_STALKER, OPENAI_API_KEY } from '$env/static/private';
+import { JUDE, OPENAI_API_KEY } from '$env/static/private';
 import type { GptOcrResponse, GptProviderResponse, GptAnalysisResponse, GptResponseType, GptSocialProfilerResponse } from '$lib/types';
 import { OpenAI, toFile } from 'openai';
 import type winston from 'winston';
+import SerpProvider from '../providers/serp';
+import { OCR_SYSTEM_PROMPT, PROVIDER_INSPECTOR_SYSTEM_PROMPT, SOCIAL_PROFILER_SYSTEM_PROMPT } from '$lib/utils/sys';
 
 class OpenAIService {
     private client: OpenAI;
     private logger: winston.Logger;
     private analysisAssistantId: string;
-    private ocrAssistantId: string;
-    private socialProfilerAssistantId: string;
-    private providerInspectorAssistantId: string;
+    private serpProvider: SerpProvider;
 
     constructor(logger: winston.Logger) {
         this.client = new OpenAI({
             apiKey: OPENAI_API_KEY,
         });
         this.logger = logger;
-
+        this.serpProvider = new SerpProvider(logger);
         this.analysisAssistantId = JUDE;
-        this.ocrAssistantId = JUDE_EYE;
-        this.socialProfilerAssistantId = JUDE_STALKER;
-        this.providerInspectorAssistantId = JUDE_SPECTRE;
     }
 
-    async analyzeDocument(fileBuffer: Buffer, fileName: string) {
+    async analyzeDocument(files: Array<{ buffer: Buffer; name: string }>) {
         try {
 
-            const file = await this.client.files.create({
-                file: await toFile(fileBuffer, fileName),
-                purpose: 'assistants',
-            });
+            if (!files.length) {
+                throw new Error('At least one file must be provided');
+            }
+
+            const uploadedFiles = await Promise.all(files.map(async ({ buffer, name }) => {
+                const fileExt = name.split('.').pop()?.toLowerCase();
+                if (!fileExt || !['jpg', 'jpeg', 'png'].includes(fileExt)) {
+                    throw new Error('Only image files (jpg, jpeg, png) are supported');
+                }
+                return this.client.files.create({
+                    file: await toFile(buffer, name),
+                    purpose: 'vision',
+                });
+            }));
 
             const thread = await this.client.beta.threads.create();
 
+
             await this.client.beta.threads.messages.create(thread.id, {
                 role: 'user',
-                content: 'Please analyze this document.',
-                attachments: [{
-                    file_id: file.id,
-                    tools: [
-                        {
-                            type: 'file_search'
-                        }
-                    ]
-                }],
+                content: uploadedFiles.map(c => ({
+                    type: 'image_file' as const,
+                    image_file: {
+                        file_id: c.id,
+                        detail: 'auto'
+                    }
+                })),
+                attachments: [],
             });
 
             const run = await this.client.beta.threads.runs.create(thread.id, {
@@ -61,90 +68,91 @@ class OpenAIService {
 
     async performOCR(fileBuffer: Buffer, fileName: string) {
         try {
+            const fileExt = fileName.split('.').pop()?.toLowerCase();
 
-            const file = await this.client.files.create({
-                file: await toFile(fileBuffer, fileName),
-                purpose: 'assistants',
-            });
+            if (!fileExt || !['jpg', 'jpeg', 'png'].includes(fileExt)) {
+                throw new Error('Only image files (jpg, jpeg, png) are supported');
+            }
 
-            const thread = await this.client.beta.threads.create();
+            const base64Image = fileBuffer.toString('base64');
 
-            const fileExt = fileName.split('.').pop();
-
-            if (fileExt === 'pdf') {
-                await this.client.beta.threads.messages.create(thread.id, {
-                    role: 'user',
-                    content: 'Please extract data from this document.',
-                    attachments: [{
-                        file_id: file.id,
-                        tools: [
+            const response = await this.client.chat.completions.create({
+                model: "gpt-4o",
+                messages: [
+                    {
+                        role: "system",
+                        content: OCR_SYSTEM_PROMPT
+                    },
+                    {
+                        role: "user",
+                        content: [
                             {
-                                type: 'file_search'
+                                type: "text",
+                                text: "Please extract data from this image."
+                            },
+                            {
+                                type: "image_url",
+                                image_url: {
+                                    url: `data:image/${fileExt};base64,${base64Image}`
+                                }
                             }
                         ]
-                    }],
-                });
-            }
-            else if (fileExt === 'jpg' || fileExt === 'jpeg' || fileExt === 'png') {
-                await this.client.beta.threads.messages.create(thread.id, {
-                    role: 'user',
-                    content: [
-                        {
-                            type: 'text',
-                            text: "Please extract from this image."
-                        },
-                        {
-                            type: 'image_file',
-                            image_file: {
-                                file_id: file.id,
-                            }
-                        }
-                    ]
-                });
-            }
-            else {
-                throw new Error('File type not supported');
-            }
-
-            const run = await this.client.beta.threads.runs.create(thread.id, {
-                assistant_id: this.ocrAssistantId,
+                    }
+                ],
+                max_tokens: 4096,
+                response_format: {
+                    type: "json_object"
+                }
             });
 
-            const response = await this.waitForRunCompletion<GptOcrResponse>(thread.id, run.id);
-            return response;
+            const result = JSON.parse(response.choices[0].message.content || "{}") as GptOcrResponse;
+            return { success: true, data: result };
 
         } catch (error) {
-            this.logger.error('Error extracting data from document:', error);
+            this.logger.error('Error extracting data from image:', error);
             throw error;
         }
     }
 
     async performSocialProfiling(name: string) {
         try {
-
-            const thread = await this.client.beta.threads.create();
-
-            if (name) {
-                await this.client.beta.threads.messages.create(thread.id, {
-                    role: 'user',
-                    content: [
-                        {
-                            type: 'text',
-                            text: `Please profile this person: ${name}`
-                        },
-                    ]
-                });
-            }
-            else {
+            if (!name) {
                 throw new Error('name must not be null');
             }
 
-            const run = await this.client.beta.threads.runs.create(thread.id, {
-                assistant_id: this.socialProfilerAssistantId,
+            const searchResult = await this.serpProvider.search({
+                q: `${name} profile background information`,
+                gl: "ZW"
             });
 
-            const response = await this.waitForRunCompletion<GptSocialProfilerResponse>(thread.id, run.id);
-            return response;
+            this.logger.debug(`Search result: ${JSON.stringify(searchResult)}`);
+
+            if (!searchResult.success) {
+                throw new Error('Failed to fetch additional context');
+            }
+
+            const contextData = searchResult.data.organic.map(result => result.snippet).join('\n');
+
+            const response = await this.client.chat.completions.create({
+                model: "gpt-4o",
+                messages: [
+                    {
+                        role: "system",
+                        content: SOCIAL_PROFILER_SYSTEM_PROMPT
+                    },
+                    {
+                        role: "user",
+                        content: `Please profile this person: ${name}\n\nAdditional Context:\n${contextData}`
+                    }
+                ],
+                max_tokens: 4096,
+                response_format: {
+                    type: "json_object"
+                }
+            });
+
+            const result = JSON.parse(response.choices[0].message.content || "{}") as GptSocialProfilerResponse;
+            return { success: true, data: result };
 
         } catch (error) {
             this.logger.error('Error whilst profiling:', error);
@@ -154,30 +162,44 @@ class OpenAIService {
 
     async performProviderProfiling(provider: string) {
         try {
-
-            const thread = await this.client.beta.threads.create();
-
-            if (provider) {
-                await this.client.beta.threads.messages.create(thread.id, {
-                    role: 'user',
-                    content: [
-                        {
-                            type: 'text',
-                            text: `Please profile this health provider in case of similar names lean towards Zimbabwefan Providers: ${provider}`
-                        },
-                    ]
-                });
-            }
-            else {
+            if (!provider) {
                 throw new Error('provider must not be null');
             }
 
-            const run = await this.client.beta.threads.runs.create(thread.id, {
-                assistant_id: this.providerInspectorAssistantId,
+            const searchResult = await this.serpProvider.search({
+                q: `${provider} healthcare provider Zimbabwe services reviews`,
+                gl: "ZW"
             });
 
-            const response = await this.waitForRunCompletion<GptProviderResponse>(thread.id, run.id);
-            return response;
+            this.logger.debug(`Search result: ${JSON.stringify(searchResult)}`);
+
+
+            if (!searchResult.success) {
+                throw new Error('Failed to fetch additional context');
+            }
+
+            const contextData = searchResult.data.organic.map(result => result.snippet).join('\n');
+
+            const response = await this.client.chat.completions.create({
+                model: "gpt-4o",
+                messages: [
+                    {
+                        role: "system",
+                        content: PROVIDER_INSPECTOR_SYSTEM_PROMPT
+                    },
+                    {
+                        role: "user",
+                        content: `Please profile this health provider: ${provider}\n\nAdditional Context:\n${contextData}`
+                    }
+                ],
+                max_tokens: 4096,
+                response_format: {
+                    type: "json_object"
+                }
+            });
+
+            const result = JSON.parse(response.choices[0].message.content || "{}") as GptProviderResponse;
+            return { success: true, data: result };
 
         } catch (error) {
             this.logger.error('Error whilst profiling:', error);
