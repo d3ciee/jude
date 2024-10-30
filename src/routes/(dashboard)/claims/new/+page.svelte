@@ -3,28 +3,37 @@
   import { Button } from "$lib/ui/button";
   import { Card } from "$lib/ui/card";
   import { Progress } from "$lib/ui/progress";
-  import { Alert, AlertDescription, AlertTitle } from "$lib/ui/alert";
-  import { Badge } from "$lib/ui/badge";
-  import { Skeleton } from "$lib/ui/skeleton";
+  import { Input } from "$lib/ui/input";
   import Upload from "lucide-svelte/icons/upload";
   import { onDestroy } from "svelte";
   import PageContainer from "../../_components/page-container";
-  import type { GptResponse } from "$lib/types";
+  import type { 
+    GptAnalysisResponse, 
+    GptOcrResponse, 
+    GptProviderResponse, 
+    GptSocialProfilerResponse 
+  } from "$lib/types";
   import { toast } from "$lib/ui/sonner";
 
+  // State management
   let loading = false;
-  let result: Result<GptResponse> | null = null;
   let fileName: string | null = null;
   let progressValue = 0;
   let progressInterval: ReturnType<typeof setInterval>;
+  let name = '';
+  let provider = '';
 
+  // Results state
+  let analysisResult: Result<GptAnalysisResponse> | null = null;
+  let ocrResult: Result<GptOcrResponse> | null = null;
+  let socialResult: Result<GptSocialProfilerResponse> | null = null;
+  let providerResult: Result<GptProviderResponse> | null = null;
+
+  // Progress management
   function startProgressSimulation() {
     progressValue = 0;
     progressInterval = setInterval(() => {
-      progressValue += 10;
-      if (progressValue >= 100) {
-        clearInterval(progressInterval);
-      }
+      progressValue = Math.min(progressValue + 10, 95);
     }, 1000);
   }
 
@@ -43,192 +52,202 @@
       fileName = input.files[0].name;
     }
   }
+
+  // Common form enhancement function
+  function createFormEnhancer(resultSetter: (result: any) => void, successMessage: string) {
+    return () => {
+      loading = true;
+      startProgressSimulation();
+      return async ({ result }) => {
+        stopProgressSimulation();
+        loading = false;
+        if (result.type === "success") {
+          resultSetter(result.data.result);
+          if (result.data.result?.success) {
+            toast.success(successMessage);
+          }
+        } else {
+          toast.error("Operation failed");
+        }
+      };
+    };
+  }
 </script>
 
-<PageContainer title="Claims Analysis">
-  <div class="flex gap-4 p-4 h-full">
-    <!-- Upload Section -->
-    <Card class="flex-1 p-6">
-      <form
-        method="POST"
-        action="?/analyze"
-        enctype="multipart/form-data"
-        use:enhance={() => {
-          loading = true;
-          startProgressSimulation();
-          return async ({ result: formResult }) => {
-            stopProgressSimulation();
-            console.log(formResult);
-            loading = false;
-
-            if (formResult.type === "success" && formResult.data !== null) {
-              console.log(result);
-              result = formResult.data as Result<GptResponse>;
-              if (result.success) {
-                toast.success("Document analyzed successfully");
-              }
-            } else {
-              toast.error("Something went wrong");
-            }
-          };
-        }}
-        class="space-y-4"
-      >
-        <div
-          class="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-12"
+<PageContainer title="OpenAI Service Testing">
+  <div class="container mx-auto p-4 space-y-6">
+    <!-- Service Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <!-- Document Analysis Card -->
+      <Card class="p-6">
+        <h3 class="text-lg font-semibold mb-4">Document Analysis</h3>
+        <form
+          method="POST"
+          action="?/analyze"
+          enctype="multipart/form-data"
+          use:enhance={createFormEnhancer(
+            (result) => (analysisResult = result),
+            "Document analyzed successfully"
+          )}
+          class="space-y-4"
         >
-          <Upload class="w-12 h-12 text-muted-foreground mb-4" />
-          <input
-            type="file"
-            name="file"
-            id="file"
-            class="hidden"
-            accept=".pdf,.doc,.docx"
-            on:change={handleFileSelect}
+          <div class="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 hover:border-primary/50 transition-colors">
+            <Upload class="w-8 h-8 text-muted-foreground mb-3" />
+            <input
+              type="file"
+              name="file"
+              id="file"
+              class="hidden"
+              accept=".pdf,.doc,.docx"
+              on:change={handleFileSelect}
+            />
+            <label
+              for="file"
+              class="text-sm text-muted-foreground cursor-pointer hover:text-foreground text-center"
+            >
+              {fileName || "Click to upload or drag and drop"}
+            </label>
+          </div>
+          <Button type="submit" disabled={loading || !fileName} class="w-full">
+            {loading ? "Analyzing..." : "Analyze Document"}
+          </Button>
+        </form>
+      </Card>
+
+      <!-- OCR Testing Card -->
+      <Card class="p-6">
+        <h3 class="text-lg font-semibold mb-4">OCR Testing</h3>
+        <form
+          method="POST"
+          action="?/ocr"
+          enctype="multipart/form-data"
+          use:enhance={createFormEnhancer(
+            (result) => (ocrResult = result),
+            "OCR completed successfully"
+          )}
+          class="space-y-4"
+        >
+          <div class="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 hover:border-primary/50 transition-colors">
+            <Upload class="w-8 h-8 text-muted-foreground mb-3" />
+            <input
+              type="file"
+              name="file"
+              id="ocr-file"
+              class="hidden"
+              accept=".pdf,.jpg,.jpeg,.png"
+              on:change={handleFileSelect}
+            />
+            <label
+              for="ocr-file"
+              class="text-sm text-muted-foreground cursor-pointer hover:text-foreground text-center"
+            >
+              {fileName || "Click to upload or drag and drop"}
+            </label>
+          </div>
+          <Button type="submit" disabled={loading || !fileName} class="w-full">
+            {loading ? "Processing..." : "Perform OCR"}
+          </Button>
+        </form>
+      </Card>
+
+      <!-- Social Profiling Card -->
+      <Card class="p-6">
+        <h3 class="text-lg font-semibold mb-4">Social Profiling</h3>
+        <form
+          method="POST"
+          action="?/profileSocial"
+          use:enhance={createFormEnhancer(
+            (result) => (socialResult = result),
+            "Social profile generated successfully"
+          )}
+          class="space-y-4"
+        >
+          <Input 
+            type="text" 
+            name="name" 
+            bind:value={name} 
+            placeholder="Enter name to profile"
+            class="w-full" 
           />
-          <label
-            for="file"
-            class="text-sm text-muted-foreground cursor-pointer hover:text-foreground"
-          >
-            {fileName ? fileName : "Click to upload or drag and drop"}
-          </label>
-        </div>
+          <Button type="submit" disabled={loading || !name} class="w-full">
+            {loading ? "Profiling..." : "Generate Social Profile"}
+          </Button>
+        </form>
+      </Card>
 
-        <Button type="submit" disabled={loading || !fileName} class="w-full">
-          {loading ? "Analyzing..." : "Analyze Document"}
-        </Button>
+      <!-- Provider Profiling Card -->
+      <Card class="p-6">
+        <h3 class="text-lg font-semibold mb-4">Provider Profiling</h3>
+        <form
+          method="POST"
+          action="?/profileProvider"
+          use:enhance={createFormEnhancer(
+            (result) => (providerResult = result),
+            "Provider profile generated successfully"
+          )}
+          class="space-y-4"
+        >
+          <Input 
+            type="text" 
+            name="provider" 
+            bind:value={provider} 
+            placeholder="Enter provider name"
+            class="w-full" 
+          />
+          <Button type="submit" disabled={loading || !provider} class="w-full">
+            {loading ? "Profiling..." : "Generate Provider Profile"}
+          </Button>
+        </form>
+      </Card>
+    </div>
 
-        {#if loading}
-          <Progress value={progressValue} class="w-full" />
-        {/if}
+    <!-- Progress Bar -->
+    {#if loading}
+      <Progress value={progressValue} class="w-full" />
+    {/if}
 
-        {#if result !== null && !result.success}
-          <Alert variant="destructive">
-            <AlertDescription>{result.error}</AlertDescription>
-          </Alert>
-        {/if}
-      </form>
-    </Card>
-
-    <!-- Analysis Results -->
-    <Card class="flex-1 p-6">
-      <h3 class="text-lg font-semibold mb-4">Analysis Results</h3>
-      {#if loading}
-        <div class="space-y-6">
-          <div>
-            <Skeleton class="h-6 w-32 mb-4" />
-            <div class="grid grid-cols-2 gap-4">
-              <Skeleton class="h-4 w-full" />
-              <Skeleton class="h-4 w-full" />
-            </div>
-          </div>
-          <div>
-            <Skeleton class="h-6 w-32 mb-4" />
-            <div class="grid grid-cols-2 gap-4">
-              <Skeleton class="h-4 w-full" />
-              <Skeleton class="h-4 w-full" />
-              <Skeleton class="h-4 w-full" />
-            </div>
-          </div>
-          <div>
-            <Skeleton class="h-6 w-32 mb-4" />
+    <!-- Results Section -->
+    {#if analysisResult || ocrResult || socialResult || providerResult}
+      <Card class="p-6">
+        <h3 class="text-lg font-semibold mb-4">Results</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {#if analysisResult}
             <div class="space-y-2">
-              <Skeleton class="h-4 w-full" />
-              <Skeleton class="h-4 w-3/4" />
-            </div>
-          </div>
-        </div>
-      {:else if result !== null && result.success && result.data.isValid && result.data.analysis !== null}
-        <div class="space-y-6">
-          <!-- Claimant Info -->
-          <div>
-            <h4 class="text-sm font-semibold mb-2">Claimant Information</h4>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <div>Name: {result.data.analysis.claimant.name}</div>
-              <div>Age: {result.data.analysis.claimant.age}</div>
-            </div>
-          </div>
-
-          <!-- Claim Details -->
-          <div>
-            <h4 class="text-sm font-semibold mb-2">Claim Details</h4>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <div>Date: {result.data.analysis.claimDetails.submissionDate}</div>
-              <div>Type: {result.data.analysis.claimDetails.treatmentType}</div>
-              <div>Provider: {result.data.analysis.claimDetails.healthcareProvider}</div>
-              <div>Amount: ${result.data.analysis.claimDetails.claimAmount}</div>
-              <div>Location: {result.data.analysis.claimDetails.location}</div>
-            </div>
-          </div>
-
-          <!-- Fraud Detection -->
-          <div>
-            <h4 class="text-sm font-semibold mb-2">Risk Assessment</h4>
-            <div class="space-y-2">
-              <div class="flex items-center gap-2">
-                <div>Trust Score:</div>
-                <Progress
-                  value={result.data.analysis.fraudDetection.trustabilityScore}
-                  class="w-32"
-                />
-                <span class="text-sm"
-                  >{result.data.analysis.fraudDetection.trustabilityScore}%</span
-                >
-              </div>
-              {#if result.data.analysis.fraudDetection.flags.length > 0}
-                <div class="flex gap-2 flex-wrap">
-                  {#each result.data.analysis.fraudDetection.flags as flag}
-                    <Badge variant="destructive">{flag}</Badge>
-                  {/each}
-                </div>
-              {/if}
-            </div>
-          </div>
-
-          <!-- Rule Violations -->
-          {#if result.data.analysis.ruleViolations.length > 0}
-            <div>
-              <h4 class="text-sm font-semibold mb-2">Rule Violations</h4>
-              <div class="space-y-2">
-                {#each result.data.analysis.ruleViolations as violation}
-                  <Alert variant="destructive">
-                    <AlertTitle>{violation.rule}</AlertTitle>
-                    <AlertDescription>{violation.description}</AlertDescription>
-                  </Alert>
-                {/each}
-              </div>
+              <h4 class="font-medium">Document Analysis Result:</h4>
+              <pre class="bg-muted p-4 rounded-lg overflow-auto max-h-60">
+                {JSON.stringify(analysisResult, null, 2)}
+              </pre>
             </div>
           {/if}
 
-          <!-- Metrics -->
-          <div>
-            <h4 class="text-sm font-semibold mb-2">Processing Metrics</h4>
-            <div class="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                Est. Processing Time: {result.data.analysis.metrics.estimatedPayoutTime}
-              </div>
-              <div>
-                Potential Savings: ${result.data.analysis.metrics.potentialSavings}
-              </div>
-              {#if result.data.analysis.metrics.humanInterventionRequired}
-                <div class="col-span-2">
-                  <Badge>Requires Manual Review</Badge>
-                </div>
-              {/if}
+          {#if ocrResult}
+            <div class="space-y-2">
+              <h4 class="font-medium">OCR Result:</h4>
+              <pre class="bg-muted p-4 rounded-lg overflow-auto max-h-60">
+                {JSON.stringify(ocrResult, null, 2)}
+              </pre>
             </div>
-          </div>
+          {/if}
+
+          {#if socialResult}
+            <div class="space-y-2">
+              <h4 class="font-medium">Social Profile Result:</h4>
+              <pre class="bg-muted p-4 rounded-lg overflow-auto max-h-60">
+                {JSON.stringify(socialResult, null, 2)}
+              </pre>
+            </div>
+          {/if}
+
+          {#if providerResult}
+            <div class="space-y-2">
+              <h4 class="font-medium">Provider Profile Result:</h4>
+              <pre class="bg-muted p-4 rounded-lg overflow-auto max-h-60">
+                {JSON.stringify(providerResult, null, 2)}
+              </pre>
+            </div>
+          {/if}
         </div>
-      {:else if result !== null && result.success && !result.data.isValid}
-        <div>
-          <Alert variant="destructive">
-              The uploaded document could not be processed. Please check the file format and try again.
-          </Alert>
-        </div>
-      {:else}
-        <div class="text-muted-foreground text-center">
-          Upload a document to see the analysis
-        </div>
-      {/if}
-    </Card>
+      </Card>
+    {/if}
   </div>
 </PageContainer>
