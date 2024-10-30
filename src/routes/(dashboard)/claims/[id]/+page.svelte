@@ -101,19 +101,19 @@
                                             class="grid gap-6 grid-cols-3 h-full w-full"
                                         >
                                             <div class="col-span-2">
-                                                {#if file.name.endsWith(".pdf")}
+                                                <!-- {#if file.name.endsWith(".pdf")}
                                                     <PdfViewer
                                                         fileName={file.fileStorageKey}
                                                     />
                                                 {:else if ["png", "gif", "jpeg", "jpg", "webp"].includes(file.fileStorageKey
                                                         .split(".")[1]
-                                                        .toLowerCase())}
+                                                        )} -->
                                                     <img
                                                         src={`https://pub-3d4d614658744eaaba570c12de083c1c.r2.dev/${file.fileStorageKey}`}
                                                         alt={file.name}
                                                         class="w-full bg-secondary aspect-video object-contain"
                                                     />
-                                                {:else}
+                                                <!-- {:else}
                                                     <div
                                                         class="flex items-center justify-center w-full bg-secondary aspect-video"
                                                     >
@@ -121,7 +121,7 @@
                                                             class="h-12 w-12 text-primary"
                                                         />
                                                     </div>
-                                                {/if}
+                                                {/if} -->
                                             </div>
                                             <div class="col-span-1">
                                                 <h3
