@@ -85,8 +85,7 @@ class OpenAIService {
                     }],
                 });
             }
-
-            if (fileExt === 'jpg' || fileExt === 'jpeg' || fileExt === 'png') {
+            else if (fileExt === 'jpg' || fileExt === 'jpeg' || fileExt === 'png') {
                 await this.client.beta.threads.messages.create(thread.id, {
                     role: 'user',
                     content: [
