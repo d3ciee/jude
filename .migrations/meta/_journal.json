@@ -43,6 +43,13 @@
       "when": 1730191028948,
       "tag": "0005_pink_micromax",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1730293572223,
+      "tag": "0006_kind_oracle",
+      "breakpoints": true
     }
   ]
 }

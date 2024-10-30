@@ -13,37 +13,85 @@
 
     import 'chartjs-adapter-luxon';
 
+    import colors from "tailwindcss/colors";
+
     import {
 		Chart,
 		TimeScale,
         LineController,
         LineElement,
 		CategoryScale,
+        Filler,
 		LinearScale,
 		Tooltip,
         PointElement
 	} from 'chart.js';
+    import type { AuditLog, TClaim } from "$lib/server/db/schema";
+    import { toast } from "$lib/ui/sonner";
 
     const {data} = $props();
+
+    let claims:Array<TClaim & {
+        files: number;
+    }> = $state([])
+
+    let auditLogs:Array<typeof AuditLog.$inferInsert & { user: { name: string, email: string } }> = $state([])
+
+    $effect(()=>{
+        if(!data.props.auditLogs.success){
+            toast.error("Failed to get audit logs", {description:data.props.auditLogs.error})
+            return;
+        }
+        auditLogs = data.props.auditLogs.data.logs;
+    })
+
+    $effect(()=>{
+        if(!data.props.claims.success){
+            toast.error("Failed to get audit logs", {description:data.props.claims.error})
+            return;
+        }
+        claims = data.props.claims.data.claims;
+    })
 
     let canvas: HTMLCanvasElement;
 	let chart: Chart<any> | undefined = undefined;
 
-    onMount(()=>{
+        
+        onMount(()=>{
+            const ctx = canvas.getContext('2d')!;
+            
+
         const data = {
         labels: Array.from({ length: 7 }, (_, i) => `Day ${i + 1}`),
-        datasets: [{
-            label: 'My First Dataset',
-            data: [65, 59, 80, 81, 56, 55, 40],
-            fill: false,
-            borderColor: 'rgb(75, 192, 192)',
-            tension: 0.1
-        }]
+        datasets: [
+        {
+            label: 'Accepted claims',
+            data: [0,0, 0, 1, 1, 2],
+            borderColor: colors.green[500],
+            borderWidth: 2,
+
+            tension: 0.3
+        },{
+            label: 'Rejected claims',
+            data: [0,0, 1, 0, 1, 1],
+            borderWidth: 2,
+            
+            borderColor: colors.red[500],
+            tension: 0.3
+        },
+        {
+            label: 'Total submitted claims',
+            data: [0,0, 1, 1, 2, 4],
+            borderWidth: 2,
+            
+            borderColor: colors.gray[700],
+            tension: 0.3
+        },
+    ]
         };
 
-        Chart.register(LineController, LineElement, CategoryScale, LinearScale, TimeScale, Tooltip,PointElement);
-		const ctx = canvas.getContext('2d')!;
-
+        Chart.register(LineController, LineElement, CategoryScale, LinearScale, TimeScale, Tooltip,PointElement,Filler);
+		
         chart = new Chart(ctx, {
             type: 'line',
             data: data,
@@ -57,7 +105,9 @@
                 scales: {
                     y: {
                         beginAtZero: false,
+                        
                         ticks:{
+                            stepSize:1,
                             font:{}
                         }
                     },
@@ -107,10 +157,10 @@
         </div>
         <main class="flex flex-1 flex-col gap-4">
             <div class="grid gap-4 grid-cols-4">
-                {@render KpiCard({title:"Avg Claim Processing Time", icon: Clock, value:"2m 52s", previousValue:"3m 12s"})}
-                {@render KpiCard({title:" First-Pass Resolution Rate", icon: Medal, value:"98%", previousValue:"95%"})}
-                {@render KpiCard({title:"Claim denial rate", icon: TriangleAlert, value:"2%", previousValue:"5%"})}
-                {@render KpiCard({title:"User satisfaction score", icon: Star, value:"4.9/5", previousValue:"4.5"})}
+                {@render KpiCard({title:"Avg Claim Processing Time", icon: Clock, value:"2m 52s", previousValue:"0s"})}
+                {@render KpiCard({title:" Total claims processed", icon: Medal, value:"8", previousValue:"0"})}
+                {@render KpiCard({title:"Claim denial rate", icon: TriangleAlert, value:"2%", previousValue:"0%"})}
+                {@render KpiCard({title:"User satisfaction score", icon: Star, value:"4.9/5", previousValue:"0/5"})}
             </div>
             <div class="h-[300px] p-4 border rounded">
                 
@@ -128,7 +178,7 @@
                                 >Recent claims applied for.</Card.Description
                             >
                         </div>
-                        <Button href="##" size="sm" class="ml-auto gap-1">
+                        <Button href="/claims" size="sm" class="ml-auto gap-1">
                             View All
                             <ArrowUpRight class="h-4 w-4" />
                         </Button>
@@ -137,9 +187,9 @@
                         <Table.Root>
                             <Table.Header>
                                 <Table.Row>
-                                    <Table.Head>Customer</Table.Head>
+                                    <Table.Head>Membership Number</Table.Head>
                                     <Table.Head class="xl:table.-column hidden"
-                                        >Type</Table.Head
+                                        >Submitted by</Table.Head
                                     >
                                     <Table.Head class="xl:table.-column hidden"
                                         >Status</Table.Head
@@ -148,250 +198,74 @@
                                         >Date</Table.Head
                                     >
                                     <Table.Head class="text-right"
-                                        >Amount</Table.Head
+                                        >Status</Table.Head
                                     >
                                 </Table.Row>
                             </Table.Header>
                             <Table.Body>
-                                <Table.Row>
-                                    <Table.Cell>
-                                        <div class="font-medium">
-                                            Liam Johnson
-                                        </div>
-                                        <div
-                                            class="text-muted-foreground hidden text-sm md:inline"
+                                {#each claims as c}
+                                    <Table.Row>
+                                        <Table.Cell>
+                                            <div class="font-medium">
+                                                {c.membershipNumber}
+                                            </div>
+                                            <div
+                                                class="text-muted-foreground hidden text-sm md:inline"
+                                            >
+                                                submitted claim using {c.submissionChannel}
+                                            </div>
+                                        </Table.Cell>
+                                        <Table.Cell class="xl:table.-column hidden"
+                                            >{c.submittedBy}</Table.Cell
                                         >
-                                            liam@example.com
-                                        </div>
-                                    </Table.Cell>
-                                    <Table.Cell class="xl:table.-column hidden"
-                                        >Sale</Table.Cell
-                                    >
-                                    <Table.Cell class="xl:table.-column hidden">
-                                        <Badge class="text-xs" variant="outline"
-                                            >Approved</Badge
+                                        <Table.Cell class="xl:table.-column hidden">
+                                            <Badge class="text-xs" variant="outline"
+                                                >{c.status}</Badge
+                                            >
+                                        </Table.Cell>
+                                        <Table.Cell
+                                            class="md:table.-cell xl:table.-column hidden lg:hidden"
                                         >
-                                    </Table.Cell>
-                                    <Table.Cell
-                                        class="md:table.-cell xl:table.-column hidden lg:hidden"
-                                    >
-                                        2023-06-23
-                                    </Table.Cell>
-                                    <Table.Cell class="text-right"
-                                        >$250.00</Table.Cell
-                                    >
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.Cell>
-                                        <div class="font-medium">
-                                            Olivia Smith
-                                        </div>
-                                        <div
-                                            class="text-muted-foreground hidden text-sm md:inline"
+                                            {new Date(c.createdAt).toLocaleDateString()}
+                                        </Table.Cell>
+                                        <Table.Cell class="text-right"
+                                            >{c.status}</Table.Cell
                                         >
-                                            olivia@example.com
-                                        </div>
-                                    </Table.Cell>
-                                    <Table.Cell class="xl:table.-column hidden"
-                                        >Refund</Table.Cell
-                                    >
-                                    <Table.Cell class="xl:table.-column hidden">
-                                        <Badge class="text-xs" variant="outline"
-                                            >Declined</Badge
-                                        >
-                                    </Table.Cell>
-                                    <Table.Cell
-                                        class="md:table.-cell xl:table.-column hidden lg:hidden"
-                                    >
-                                        2023-06-24
-                                    </Table.Cell>
-                                    <Table.Cell class="text-right"
-                                        >$150.00</Table.Cell
-                                    >
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.Cell>
-                                        <div class="font-medium">
-                                            Noah Williams
-                                        </div>
-                                        <div
-                                            class="text-muted-foreground hidden text-sm md:inline"
-                                        >
-                                            noah@example.com
-                                        </div>
-                                    </Table.Cell>
-                                    <Table.Cell class="xl:table.-column hidden">
-                                        Subscription
-                                    </Table.Cell>
-                                    <Table.Cell class="xl:table.-column hidden">
-                                        <Badge class="text-xs" variant="outline"
-                                            >Approved</Badge
-                                        >
-                                    </Table.Cell>
-                                    <Table.Cell
-                                        class="md:table.-cell xl:table.-column hidden lg:hidden"
-                                    >
-                                        2023-06-25
-                                    </Table.Cell>
-                                    <Table.Cell class="text-right"
-                                        >$350.00</Table.Cell
-                                    >
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.Cell>
-                                        <div class="font-medium">
-                                            Emma Brown
-                                        </div>
-                                        <div
-                                            class="text-muted-foreground hidden text-sm md:inline"
-                                        >
-                                            emma@example.com
-                                        </div>
-                                    </Table.Cell>
-                                    <Table.Cell class="xl:table.-column hidden"
-                                        >Sale</Table.Cell
-                                    >
-                                    <Table.Cell class="xl:table.-column hidden">
-                                        <Badge class="text-xs" variant="outline"
-                                            >Approved</Badge
-                                        >
-                                    </Table.Cell>
-                                    <Table.Cell
-                                        class="md:table.-cell xl:table.-column hidden lg:hidden"
-                                    >
-                                        2023-06-26
-                                    </Table.Cell>
-                                    <Table.Cell class="text-right"
-                                        >$450.00</Table.Cell
-                                    >
-                                </Table.Row>
-                                <Table.Row>
-                                    <Table.Cell>
-                                        <div class="font-medium">
-                                            Liam Johnson
-                                        </div>
-                                        <div
-                                            class="text-muted-foreground hidden text-sm md:inline"
-                                        >
-                                            liam@example.com
-                                        </div>
-                                    </Table.Cell>
-                                    <Table.Cell class="xl:table.-column hidden"
-                                        >Sale</Table.Cell
-                                    >
-                                    <Table.Cell class="xl:table.-column hidden">
-                                        <Badge class="text-xs" variant="outline"
-                                            >Approved</Badge
-                                        >
-                                    </Table.Cell>
-                                    <Table.Cell
-                                        class="md:table.-cell xl:table.-column hidden lg:hidden"
-                                    >
-                                        2023-06-27
-                                    </Table.Cell>
-                                    <Table.Cell class="text-right"
-                                        >$550.00</Table.Cell
-                                    >
-                                </Table.Row>
+                                    </Table.Row>
+                                {/each}
                             </Table.Body>
                         </Table.Root>
                     </Card.Content>
                 </Card.Root>
                 <Card.Root>
                     <Card.Header>
-                        <Card.Title>Recent Sales</Card.Title>
+                        <Card.Title>Audit logs</Card.Title>
                     </Card.Header>
                     <Card.Content class="grid gap-8">
+                        {#each auditLogs as log}
+                        
                         <div class="flex items-center gap-4">
                             <Avatar.Root class="hidden h-9 w-9 sm:flex">
                                 <Avatar.Image
                                     src="/avatars/01.png"
                                     alt="Avatar"
                                 />
-                                <Avatar.Fallback>OM</Avatar.Fallback>
+                                <Avatar.Fallback>{log.user.name[0].toUpperCase()}</Avatar.Fallback>
                             </Avatar.Root>
                             <div class="grid gap-1">
                                 <p class="text-sm font-medium leading-none">
-                                    Olivia Martin
+                                    {log.user.name}
                                 </p>
                                 <p class="text-muted-foreground text-sm">
-                                    olivia.martin@email.com
+                                    {log.details}
                                 </p>
                             </div>
-                            <div class="ml-auto font-medium">+$1,999.00</div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <Avatar.Root class="hidden h-9 w-9 sm:flex">
-                                <Avatar.Image
-                                    src="/avatars/02.png"
-                                    alt="Avatar"
-                                />
-                                <Avatar.Fallback>JL</Avatar.Fallback>
-                            </Avatar.Root>
-                            <div class="grid gap-1">
-                                <p class="text-sm font-medium leading-none">
-                                    Jackson Lee
-                                </p>
-                                <p class="text-muted-foreground text-sm">
-                                    jackson.lee@email.com
-                                </p>
+                            <div class="ml-auto font-medium">
+                                {new Date(log.createdAt).toLocaleDateString()}
                             </div>
-                            <div class="ml-auto font-medium">+$39.00</div>
                         </div>
-                        <div class="flex items-center gap-4">
-                            <Avatar.Root class="hidden h-9 w-9 sm:flex">
-                                <Avatar.Image
-                                    src="/avatars/03.png"
-                                    alt="Avatar"
-                                />
-                                <Avatar.Fallback>IN</Avatar.Fallback>
-                            </Avatar.Root>
-                            <div class="grid gap-1">
-                                <p class="text-sm font-medium leading-none">
-                                    Isabella Nguyen
-                                </p>
-                                <p class="text-muted-foreground text-sm">
-                                    isabella.nguyen@email.com
-                                </p>
-                            </div>
-                            <div class="ml-auto font-medium">+$299.00</div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <Avatar.Root class="hidden h-9 w-9 sm:flex">
-                                <Avatar.Image
-                                    src="/avatars/04.png"
-                                    alt="Avatar"
-                                />
-                                <Avatar.Fallback>WK</Avatar.Fallback>
-                            </Avatar.Root>
-                            <div class="grid gap-1">
-                                <p class="text-sm font-medium leading-none">
-                                    William Kim
-                                </p>
-                                <p class="text-muted-foreground text-sm">
-                                    will@email.com
-                                </p>
-                            </div>
-                            <div class="ml-auto font-medium">+$99.00</div>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <Avatar.Root class="hidden h-9 w-9 sm:flex">
-                                <Avatar.Image
-                                    src="/avatars/05.png"
-                                    alt="Avatar"
-                                />
-                                <Avatar.Fallback>SD</Avatar.Fallback>
-                            </Avatar.Root>
-                            <div class="grid gap-1">
-                                <p class="text-sm font-medium leading-none">
-                                    Sofia Davis
-                                </p>
-                                <p class="text-muted-foreground text-sm">
-                                    sofia.davis@email.com
-                                </p>
-                            </div>
-                            <div class="ml-auto font-medium">+$39.00</div>
-                        </div>
+                        
+                        {/each}
                     </Card.Content>
                 </Card.Root>
             </div>
