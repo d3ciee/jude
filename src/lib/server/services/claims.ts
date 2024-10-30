@@ -167,9 +167,32 @@ class ClaimsService {
 
             await this.db.update(Claim).set({ procesingStep: "parsing-files" })
 
+
             if (patientName) {
-                const r = await this.oaiService.performSocialProfiling(patientName)
-                await this.db.update(Claim).set({ procesingStep: "fetching-social-profile", socialProfile: r.data.extractedData, socialProfileConfidence: r.data.confidenceLevel.toString() })
+                this.oaiService.performSocialProfiling(patientName)
+                    .then((r) => {
+                        this.db.update(Claim).
+                            set({
+                                procesingStep: "fetching-social-profile",
+                                socialProfile: r.data.extractedData,
+                                socialProfileConfidence: r.data.confidenceLevel.toString()
+                            })
+                    }).catch((e) => {
+                        this.logger.error("error fetching social profile", e)
+                    })
+            }
+            if (providerName) {
+                this.oaiService.performSocialProfiling(patientName)
+                    .then((r) => {
+                        this.db.update(Claim)
+                            .set({
+                                procesingStep: "fetching-provider-profile",
+                                providerProfile: r.data.extractedData,
+                                providerProfileConfidence: r.data.confidenceLevel.toString()
+                            })
+                    }).catch((e) => {
+                        this.logger.error("error fetching social profile", e)
+                    })
             }
 
             await this.auditService.log({

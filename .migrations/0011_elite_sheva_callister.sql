@@ -1,0 +1,1 @@
+ALTER TABLE `claim` ADD `provider_profile_confidence` text;

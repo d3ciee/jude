@@ -57,6 +57,7 @@ const Claim = sqliteTable("claim", {
     socialProfileConfidence: text("social_profile_confidence"),
 
     providerProfile: text("provider_profile", { mode: "json" }),
+    providerProfileConfidence: text("provider_profile_confidence"),
 
     metadata: text("metadata", { mode: "json" })
 })

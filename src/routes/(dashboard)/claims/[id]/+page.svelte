@@ -19,10 +19,25 @@
     import * as Card from "$lib/ui/card";
     import { Progress } from "$lib/ui/progress";
     import { Separator } from "$lib/ui/separator";
-    import { Facebook, Instagram, Linkedin, Twitter } from "lucide-svelte";
+    import {
+        Facebook,
+        Instagram,
+        Linkedin,
+        Twitter,
+        Stethoscope,
+        Building,
+        Award,
+        Clock,
+        Loader,
+        Globe,
+        Phone,
+        MapPin,
+    } from "lucide-svelte";
+    import type { GptProviderResponse, GptSocialProfilerResponse } from "$lib/types";
 
     const { data } = $props();
-    let claim: (TClaim & { files: TFile[] }) | null = $state(null);
+    let claim: (TClaim & { files: TFile[], socialProfile?:GptSocialProfilerResponse["extractedData"], providerProfile?:GptProviderResponse["extractedData"] }) | null = $state(null);
+    
 
     $effect(() => {
         if (!data.props.success) {
@@ -31,6 +46,7 @@
             });
             return;
         }
+        //@ts-ignore
         claim = data.props.data.claim;
     });
 </script>
@@ -117,7 +133,7 @@
                                                     <dl
                                                         class="grid grid-cols-2 gap-2 text-sm"
                                                     >
-                                                        {#each Object.entries(file.claim.socialProfile ? file.claim.socialProfile : { "File Name": file.name, "File Size": formatFileSize(file.size), "Created At": new Date(file.createdAt).toLocaleDateString() }) as [key, value]}
+                                                        {#each Object.entries(file.extractedData ? file.extractedData : { "File Name": file.name, "File Size": formatFileSize(file.size), "Created At": new Date(file.createdAt).toLocaleDateString() }) as [key, value]}
                                                             <dt
                                                                 class="font-medium"
                                                             >
@@ -136,6 +152,7 @@
                     </Tabs.Content>
 
                     <Tabs.Content value="social-analysis" class="mt-3">
+                        {#if claim.socialProfile && claim.providerProfile}
                         <div class="min-h-screen bg-background flex flex-col">
                             <!-- <div class="flex items-center gap-2">
                                 <Badge variant="outline"
@@ -171,7 +188,7 @@
                                                 <AvatarFallback
                                                     >{claim.socialProfile.fullName
                                                         .split(" ")
-                                                        .map((n) => n[0])
+                                                        .map((n:string) => n[0])
                                                         .join(
                                                             "",
                                                         )}</AvatarFallback
@@ -369,6 +386,181 @@
                                             </div>
                                         </Card.Content>
                                     </Card.Root>
+                                    <Card.Root class="w-full max-w-3xl mx-auto">
+                                        <Card.Header>
+                                            <Card.Title
+                                                class="text-2xl font-bold"
+                                                >{claim.providerProfile
+                                                    .providerName}</Card.Title
+                                            >
+                                            <div
+                                                class="flex items-center space-x-2"
+                                            >
+                                                TODO:Add stars
+                                                <!-- <StarRating rating={claim.providerProfile.ratings} /> -->
+                                                <span
+                                                    class="text-sm text-gray-500"
+                                                    >({claim.providerProfile
+                                                        .numberOfReviews} reviews)</span
+                                                >
+                                            </div>
+                                        </Card.Header>
+                                        <Card.Content class="grid gap-4">
+                                            <div
+                                                class="grid grid-cols-1 md:grid-cols-2 gap-4"
+                                            >
+                                                <div class="space-y-2">
+                                                    <div
+                                                        class="flex items-center space-x-2"
+                                                    >
+                                                        <MapPin
+                                                            class="w-5 h-5 text-gray-500"
+                                                        />
+                                                        <span
+                                                            >{claim
+                                                                .providerProfile
+                                                                .location}</span
+                                                        >
+                                                    </div>
+                                                    <div
+                                                        class="flex items-center space-x-2"
+                                                    >
+                                                        <Phone
+                                                            class="w-5 h-5 text-gray-500"
+                                                        />
+                                                        <span
+                                                            >{claim
+                                                                .providerProfile
+                                                                .contactNumber}</span
+                                                        >
+                                                    </div>
+                                                    <div
+                                                        class="flex items-center space-x-2"
+                                                    >
+                                                        <Globe
+                                                            class="w-5 h-5 text-gray-500"
+                                                        />
+                                                        <a
+                                                            href={claim
+                                                                .providerProfile
+                                                                .website}
+                                                            class="text-blue-500 hover:underline"
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                        >
+                                                            {claim
+                                                                .providerProfile
+                                                                .website}
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                                <div class="space-y-2">
+                                                    <div
+                                                        class="flex items-center space-x-2"
+                                                    >
+                                                        <Clock
+                                                            class="w-5 h-5 text-gray-500"
+                                                        />
+                                                        <span
+                                                            >{claim
+                                                                .providerProfile
+                                                                .operatingHours}</span
+                                                        >
+                                                    </div>
+                                                    <div
+                                                        class="flex items-center space-x-2"
+                                                    >
+                                                        <Award
+                                                            class="w-5 h-5 text-gray-500"
+                                                        />
+                                                        <span
+                                                            >{claim
+                                                                .providerProfile
+                                                                .accreditations}</span
+                                                        >
+                                                    </div>
+                                                    <div
+                                                        class="flex items-center space-x-2"
+                                                    >
+                                                        <Building
+                                                            class="w-5 h-5 text-gray-500"
+                                                        />
+                                                        <span
+                                                            >{claim
+                                                                .providerProfile
+                                                                .affiliations}</span
+                                                        >
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <h3 class="font-semibold">
+                                                    Trustability Score
+                                                </h3>
+                                                <Progress
+                                                    value={claim.providerProfile
+                                                        .trustabilityScore}
+                                                    class="w-full"
+                                                />
+                                                <span
+                                                    class="text-sm text-gray-500"
+                                                    >{claim.providerProfile.trustabilityScore.toFixed(
+                                                        1,
+                                                    )}% trustable</span
+                                                >
+                                            </div>
+                                            <div class="space-y-2">
+                                                <h3 class="font-semibold">
+                                                    Services Offered
+                                                </h3>
+                                                <p>
+                                                    {claim.providerProfile
+                                                        .servicesOffered}
+                                                </p>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <h3 class="font-semibold">
+                                                    Insurance Accepted
+                                                </h3>
+                                                <p>
+                                                    {claim.providerProfile
+                                                        .insuranceAccepted}
+                                                </p>
+                                            </div>
+                                            <div
+                                                class="flex items-center justify-between"
+                                            >
+                                                <Badge
+                                                    variant={claim
+                                                        .providerProfile
+                                                        .emergencyServices
+                                                        ? "default"
+                                                        : "secondary"}
+                                                    class="text-sm"
+                                                >
+                                                    {claim.providerProfile
+                                                        .emergencyServices
+                                                        ? "Emergency Services Available"
+                                                        : "No Emergency Services"}
+                                                </Badge>
+                                                <div
+                                                    class="flex items-center space-x-1"
+                                                >
+                                                    <Stethoscope
+                                                        class="w-5 h-5 text-gray-500"
+                                                    />
+                                                    <span
+                                                        class="text-sm text-gray-500"
+                                                        >Confidence Level: {(
+                                                            Number(
+                                                                claim.providerProfileConfidence,
+                                                            ) * 100
+                                                        ).toFixed(1)}%</span
+                                                    >
+                                                </div>
+                                            </div>
+                                        </Card.Content>
+                                    </Card.Root>
                                 </div>
                             </main>
                             <footer class="bg-muted py-4">
@@ -384,6 +576,16 @@
                                 </div>
                             </footer>
                         </div>
+                        {:else}
+                        <div
+                        class="items-center flex h-full w-full justify-center text-center gap-2 items-center"
+                    >
+                        <Loader
+                            class="h-6 w-6 animate-spin duration-150 text-primary"
+                        />
+                        loading...
+                    </div>
+                        {/if}
                     </Tabs.Content>
                 </Tabs.Root>
             {/if}

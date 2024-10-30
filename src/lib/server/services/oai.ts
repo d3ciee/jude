@@ -126,7 +126,7 @@ class OpenAIService {
             });
 
             const imageResult = await this.serpProvider.search({
-                q: `${name} profile background information`,
+                q: `${name}`,
                 gl: "ZW",
                 type: "images"
             });
