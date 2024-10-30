@@ -23,10 +23,10 @@
   let name = "";
   let provider = "";
 
-  let analysisResult: Result<GptAnalysisResponse> | null = null;
-  let ocrResult: Result<GptOcrResponse> | null = null;
-  let socialResult: Result<GptSocialProfilerResponse> | null = null;
-  let providerResult: Result<GptProviderResponse> | null = null;
+  let analysisResult: Result<GptAnalysisResponse> | null = $state(null);
+  let ocrResult: Result<GptOcrResponse> | null = $state(null);
+  let socialResult: Result<GptSocialProfilerResponse> | null = $state(null);
+  let providerResult: Result<GptProviderResponse> | null = $state(null);
 
   function startProgressSimulation() {
     progressValue = 0;
@@ -60,7 +60,7 @@
 
   function createFormEnhancer(
     resultSetter: (result: any) => void,
-    successMessage: string
+    successMessage: string,
   ) {
     return () => {
       loading = true;
@@ -94,7 +94,7 @@
           enctype="multipart/form-data"
           use:enhance={createFormEnhancer(
             (result) => (analysisResult = result),
-            "Document analyzed successfully"
+            "Document analyzed successfully",
           )}
           class="space-y-4"
         >
@@ -139,7 +139,7 @@
           enctype="multipart/form-data"
           use:enhance={createFormEnhancer(
             (result) => (ocrResult = result),
-            "OCR completed successfully"
+            "OCR completed successfully",
           )}
           class="space-y-4"
         >
@@ -182,7 +182,7 @@
           action="?/profileSocial"
           use:enhance={createFormEnhancer(
             (result) => (socialResult = result),
-            "Social profile generated successfully"
+            "Social profile generated successfully",
           )}
           class="space-y-4"
         >
@@ -207,7 +207,7 @@
           action="?/profileProvider"
           use:enhance={createFormEnhancer(
             (result) => (providerResult = result),
-            "Provider profile generated successfully"
+            "Provider profile generated successfully",
           )}
           class="space-y-4"
         >

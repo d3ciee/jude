@@ -74,6 +74,7 @@ export type GptSocialProfilerResponse = {
     extractedData: {
         fullName: string;
         birthDate: string;
+        avatar: string;
         knownAliases: string;
         occupation: string;
         location: string;

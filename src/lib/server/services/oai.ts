@@ -125,6 +125,12 @@ class OpenAIService {
                 gl: "ZW"
             });
 
+            const imageResult = await this.serpProvider.search({
+                q: `${name} profile background information`,
+                gl: "ZW",
+                type: "images"
+            });
+
             this.logger.debug(`Search result: ${JSON.stringify(searchResult)}`);
 
             if (!searchResult.success) {
@@ -151,7 +157,14 @@ class OpenAIService {
                 }
             });
 
-            const result = JSON.parse(response.choices[0].message.content || "{}") as GptSocialProfilerResponse;
+            let result = JSON.parse(response.choices[0].message.content || "{}") as GptSocialProfilerResponse;
+
+            if (imageResult.success) {
+                //@ts-ignore
+                result.extractedData.avatar = imageResult.data?.images[0]?.imageUrl
+            }
+
+
             return { success: true, data: result };
 
         } catch (error) {

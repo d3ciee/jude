@@ -9,6 +9,7 @@ export const load = (async ({ locals, params }) => {
     }
 
     const props = await locals.services.claims.getClaim(params.id)
+
     return {
         props
     };

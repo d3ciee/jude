@@ -14,6 +14,13 @@
     import PdfViewer from "./_components/pdf-viewer";
     import { ScrollArea } from "$lib/ui/scroll-area";
 
+    import { Avatar, AvatarImage, AvatarFallback } from "$lib/ui/avatar";
+    import { Badge } from "$lib/ui/badge";
+    import * as Card from "$lib/ui/card";
+    import { Progress } from "$lib/ui/progress";
+    import { Separator } from "$lib/ui/separator";
+    import { Facebook, Instagram, Linkedin, Twitter } from "lucide-svelte";
+
     const { data } = $props();
     let claim: (TClaim & { files: TFile[] }) | null = $state(null);
 
@@ -48,7 +55,7 @@
                         <Tabs.Trigger value="attached-files"
                             >Attached files</Tabs.Trigger
                         >
-                        <Tabs.Trigger value="socail-analysis"
+                        <Tabs.Trigger value="social-analysis"
                             >Social analysis</Tabs.Trigger
                         >
                         <Tabs.Trigger value="risk-analysis"
@@ -57,9 +64,6 @@
                         <Tabs.Trigger value="section-4">Section 4</Tabs.Trigger>
                     </Tabs.List>
 
-                    <Tabs.Content value="summary" class="mt-3"
-                        >stuff</Tabs.Content
-                    >
                     <Tabs.Content value="attached-files" class="mt-3">
                         <Accordion.Root class="w-full">
                             {#each claim.files as file, i}
@@ -85,7 +89,7 @@
                                                     <PdfViewer
                                                         fileName={file.fileStorageKey}
                                                     />
-                                                {:else if ["png", "gif", "jpeg", "jpg", "webp"].includes(file.name
+                                                {:else if ["png", "gif", "jpeg", "jpg", "webp"].includes(file.fileStorageKey
                                                         .split(".")[1]
                                                         .toLowerCase())}
                                                     <img
@@ -113,7 +117,7 @@
                                                     <dl
                                                         class="grid grid-cols-2 gap-2 text-sm"
                                                     >
-                                                        {#each Object.entries(file.extractedData ? file.extractedData : { "File Name": file.name, "File Size": formatFileSize(file.size), "Created At": new Date(file.createdAt).toLocaleDateString() }) as [key, value]}
+                                                        {#each Object.entries(file.claim.socialProfile ? file.claim.socialProfile : { "File Name": file.name, "File Size": formatFileSize(file.size), "Created At": new Date(file.createdAt).toLocaleDateString() }) as [key, value]}
                                                             <dt
                                                                 class="font-medium"
                                                             >
@@ -129,6 +133,257 @@
                                 </Accordion.Item>
                             {/each}
                         </Accordion.Root>
+                    </Tabs.Content>
+
+                    <Tabs.Content value="social-analysis" class="mt-3">
+                        <div class="min-h-screen bg-background flex flex-col">
+                            <!-- <div class="flex items-center gap-2">
+                                <Badge variant="outline"
+                                    >Confidence: {claim.socialProfileConfidence
+                                        ? Number(
+                                              claim.socialProfileConfidence,
+                                          ) * 100
+                                        : 0}%</Badge
+                                >
+                                <Progress
+                                    value={claim.socialProfileConfidence
+                                        ? Number(
+                                              claim.socialProfileConfidence,
+                                          ) * 100
+                                        : 0}
+                                    class="w-24"
+                                />
+                            </div> -->
+
+                            <main class="flex-grow container mx-auto px-4 py-8">
+                                <div
+                                    class="grid grid-cols-1 md:grid-cols-3 gap-8"
+                                >
+                                    <Card.Root class="md:col-span-1">
+                                        <Card.Header class="text-center">
+                                            <Avatar class="w-32 h-32 mx-auto">
+                                                <AvatarImage
+                                                    src={claim.socialProfile
+                                                        .avatar}
+                                                    alt={claim.socialProfile
+                                                        .fullName}
+                                                />
+                                                <AvatarFallback
+                                                    >{claim.socialProfile.fullName
+                                                        .split(" ")
+                                                        .map((n) => n[0])
+                                                        .join(
+                                                            "",
+                                                        )}</AvatarFallback
+                                                >
+                                            </Avatar>
+                                            <Card.Title
+                                                class="mt-4 text-2xl font-bold"
+                                                >{claim.socialProfile
+                                                    .fullName}</Card.Title
+                                            >
+                                            <p class="text-muted-foreground">
+                                                {claim.socialProfile
+                                                    .knownAliases}
+                                            </p>
+                                        </Card.Header>
+                                        <Card.Content class="text-center">
+                                            <p
+                                                class="text-sm text-muted-foreground mb-4"
+                                            >
+                                                {claim.socialProfile.occupation}
+                                            </p>
+                                            <Badge variant="secondary"
+                                                >{claim.socialProfile
+                                                    .location}</Badge
+                                            >
+                                            <Separator class="my-4" />
+                                            <div
+                                                class="flex justify-center gap-4"
+                                            >
+                                                {#if claim.socialProfile.socialMediaHandles.twitter}
+                                                    <a
+                                                        href="https://twitter.com/{claim
+                                                            .socialProfile
+                                                            .socialMediaHandles
+                                                            .twitter}"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="text-blue-500 hover:text-blue-600"
+                                                    >
+                                                        <Twitter
+                                                            class="w-6 h-6"
+                                                        />
+                                                        <span class="sr-only"
+                                                            >Twitter</span
+                                                        >
+                                                    </a>
+                                                {/if}
+                                                {#if claim.socialProfile.socialMediaHandles.facebook}
+                                                    <a
+                                                        href="https://facebook.com/{claim
+                                                            .socialProfile
+                                                            .socialMediaHandles
+                                                            .facebook}"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="text-blue-600 hover:text-blue-700"
+                                                    >
+                                                        <Facebook
+                                                            class="w-6 h-6"
+                                                        />
+                                                        <span class="sr-only"
+                                                            >Facebook</span
+                                                        >
+                                                    </a>
+                                                {/if}
+                                                {#if claim.socialProfile.socialMediaHandles.instagram}
+                                                    <a
+                                                        href="https://instagram.com/{claim
+                                                            .socialProfile
+                                                            .socialMediaHandles
+                                                            .instagram}"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="text-pink-600 hover:text-pink-700"
+                                                    >
+                                                        <Instagram
+                                                            class="w-6 h-6"
+                                                        />
+                                                        <span class="sr-only"
+                                                            >Instagram</span
+                                                        >
+                                                    </a>
+                                                {/if}
+                                                {#if claim.socialProfile.socialMediaHandles.linkedin}
+                                                    <a
+                                                        href="https://linkedin.com/in/{claim
+                                                            .socialProfile
+                                                            .socialMediaHandles
+                                                            .linkedin}"
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        class="text-blue-700 hover:text-blue-800"
+                                                    >
+                                                        <Linkedin
+                                                            class="w-6 h-6"
+                                                        />
+                                                        <span class="sr-only"
+                                                            >LinkedIn</span
+                                                        >
+                                                    </a>
+                                                {/if}
+                                            </div>
+                                        </Card.Content>
+                                    </Card.Root>
+                                    <Card.Root class="md:col-span-2">
+                                        <Card.Header>
+                                            <Card.Title
+                                                >Profile Details</Card.Title
+                                            >
+                                        </Card.Header>
+                                        <Card.Content class="space-y-6">
+                                            <div>
+                                                <h3
+                                                    class="font-semibold text-lg mb-2"
+                                                >
+                                                    Birth Date
+                                                </h3>
+                                                <p>
+                                                    {claim.socialProfile
+                                                        .birthDate}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h3
+                                                    class="font-semibold text-lg mb-2"
+                                                >
+                                                    Followers
+                                                </h3>
+                                                <p>
+                                                    {claim.socialProfile.followersCount.toLocaleString()}
+                                                </p>
+                                            </div>
+                                            {#if claim.socialProfile.publications}
+                                                <div>
+                                                    <h3
+                                                        class="font-semibold text-lg mb-2"
+                                                    >
+                                                        Publications
+                                                    </h3>
+                                                    <p>
+                                                        {claim.socialProfile
+                                                            .publications}
+                                                    </p>
+                                                </div>
+                                            {/if}
+                                            <div>
+                                                <h3
+                                                    class="font-semibold text-lg mb-2"
+                                                >
+                                                    Affiliations
+                                                </h3>
+                                                <p>
+                                                    {claim.socialProfile
+                                                        .organizationAffiliations}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h3
+                                                    class="font-semibold text-lg mb-2"
+                                                >
+                                                    Notable Achievements
+                                                </h3>
+                                                <p>
+                                                    {claim.socialProfile
+                                                        .notableAchievements}
+                                                </p>
+                                            </div>
+                                            <div>
+                                                <h3
+                                                    class="font-semibold text-lg mb-2"
+                                                >
+                                                    Interests
+                                                </h3>
+                                                <div
+                                                    class="flex flex-wrap gap-2"
+                                                >
+                                                    {#each claim.socialProfile.knownInterests.split(", ") as interest}
+                                                        <Badge
+                                                            variant="secondary"
+                                                            >{interest}</Badge
+                                                        >
+                                                    {/each}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <h3
+                                                    class="font-semibold text-lg mb-2"
+                                                >
+                                                    Related Persons
+                                                </h3>
+                                                <p>
+                                                    {claim.socialProfile
+                                                        .relatedPersons}
+                                                </p>
+                                            </div>
+                                        </Card.Content>
+                                    </Card.Root>
+                                </div>
+                            </main>
+                            <footer class="bg-muted py-4">
+                                <div
+                                    class="container mx-auto px-4 text-center text-sm text-muted-foreground"
+                                >
+                                    Data extracted by AI. Confidence level: {(claim.socialProfileConfidence
+                                        ? Number(
+                                              claim.socialProfileConfidence,
+                                          ) * 100
+                                        : 0
+                                    ).toFixed(1)}%
+                                </div>
+                            </footer>
+                        </div>
                     </Tabs.Content>
                 </Tabs.Root>
             {/if}

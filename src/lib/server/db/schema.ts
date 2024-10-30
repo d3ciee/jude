@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { integer, sqliteTable, text, numeric } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
 const User = sqliteTable("user", {
     id: text("id").notNull().primaryKey(),
@@ -48,10 +48,16 @@ const Claim = sqliteTable("claim", {
     id: text("id").notNull().primaryKey(),
     createdAt: integer("created_at").notNull(),
     status: text("stage", { enum: ["pending", "approved", "rejected"] }).notNull(),
-    procesingStep: text("processing_step", { enum: ["pending", "parsing-files", "checking-rules", "<WILL_ADD_MORE_LATER,CAN_ONLY_THINK_OF_THESE>"] }).notNull(),
+    procesingStep: text("processing_step", { enum: ["pending", "parsing-files", "fetching-social-profile", "fetching-provider-profile"] }).notNull(),
     submittedBy: text("submitted_by", { enum: ["member", "provider"] }).notNull(),
     submissionChannel: text("submission_channel", { enum: ["portal", "email", "app"] }).notNull(),
     membershipNumber: text("membership_number").notNull(),
+
+    socialProfile: text("social_profile", { mode: "json" }),
+    socialProfileConfidence: text("social_profile_confidence"),
+
+    providerProfile: text("provider_profile", { mode: "json" }),
+
     metadata: text("metadata", { mode: "json" })
 })
 type TClaim = typeof Claim.$inferSelect
@@ -67,7 +73,8 @@ const File = sqliteTable("files", {
     // @manasseh: we can fill this with the parsed data so i can use it in the claims page
     // Just make it a Record<string,primitive> so i can Object.entries it inside the claims page
     extractedData: text("extracted_data", { mode: "json" }),
-    confidence: numeric("confidence"),
+    extractedDataConfidence: text("extracted_data_confidence"),
+
 
     claimId: text("claim_id").notNull().references(() => Claim.id)
 })

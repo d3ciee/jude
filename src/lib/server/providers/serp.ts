@@ -30,9 +30,9 @@ class SerpProvider {
         this.serperApiKey = SERPER_API_KEY;
     }
 
-    public async search(input: { q: string, gl: string }): Promise<Result<{ knowledgeGraph?: SerpKnowledgeGraph, organic: SerpOrganicResult[] }>> {
+    public async search(input: { q: string, gl: string, type?: string }): Promise<Result<{ knowledgeGraph?: SerpKnowledgeGraph, organic: SerpOrganicResult[] }>> {
         try {
-            const result = await fetch("https://google.serper.dev/search", {
+            const result = await fetch("https://google.serper.dev/" + (input.type ? "search" : input.type), {
                 method: 'POST',
                 headers: {
                     'X-API-KEY': this.serperApiKey,

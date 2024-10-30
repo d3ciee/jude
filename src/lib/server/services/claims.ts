@@ -122,6 +122,10 @@ class ClaimsService {
         this.logger.debug("input", input);
 
         const claimId = genId();
+        let patientName = "";
+        let providerName = "";
+
+
         try {
             await this.db.batch([
                 this.db.insert(Claim).values({
@@ -143,24 +147,32 @@ class ClaimsService {
                         if (!s.success) throw new Error(s.error);
 
                         const ocr = await this.oaiService.performOCR(file.object, file.name);
+
+                        patientName = ocr.data.extractedData.patientName! as string;
+
                         if (!ocr.success) throw new Error("ocr failed")
                         return {
                             id: genId(),
                             claimId: claimId,
                             fileStorageKey: s.data.storageKey,
-                            name: ocr.data.documentType,
+                            type: ocr.data.documentType,
                             extractedData: ocr.data.extractedData,
                             size: file.size,
                             confidence: ocr.data.confidenceLevel.toString(),
-                            type: file.type,
+                            name: file.name,
                             createdAt: Date.now(),
                         }
                     })))
             ])
 
+            await this.db.update(Claim).set({ procesingStep: "parsing-files" })
 
+            if (patientName) {
+                const r = await this.oaiService.performSocialProfiling(patientName)
+                await this.db.update(Claim).set({ procesingStep: "fetching-social-profile", socialProfile: r.data.extractedData, socialProfileConfidence: r.data.confidenceLevel.toString() })
+            }
 
-            this.auditService.log({
+            await this.auditService.log({
                 userId: this.requestContext.userId,
                 action: "claim:create",
                 details: `created claim with id '${claimId}'`
