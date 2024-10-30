@@ -1,35 +1,33 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import { Button } from "$lib/ui/button";
+  import { Input } from "$lib/ui/input";
   import { Card } from "$lib/ui/card";
   import { Progress } from "$lib/ui/progress";
-  import { Input } from "$lib/ui/input";
   import Upload from "lucide-svelte/icons/upload";
   import { onDestroy } from "svelte";
   import PageContainer from "../../_components/page-container";
-  import type { 
-    GptAnalysisResponse, 
-    GptOcrResponse, 
-    GptProviderResponse, 
-    GptSocialProfilerResponse 
+  import type {
+    GptAnalysisResponse,
+    GptOcrResponse,
+    GptProviderResponse,
+    GptSocialProfilerResponse,
   } from "$lib/types";
   import { toast } from "$lib/ui/sonner";
 
-  // State management
   let loading = false;
-  let fileName: string | null = null;
+  let documentFileNames: string[] = [];
+  let ocrFileName: string | null = null;
   let progressValue = 0;
   let progressInterval: ReturnType<typeof setInterval>;
-  let name = '';
-  let provider = '';
+  let name = "";
+  let provider = "";
 
-  // Results state
   let analysisResult: Result<GptAnalysisResponse> | null = null;
   let ocrResult: Result<GptOcrResponse> | null = null;
   let socialResult: Result<GptSocialProfilerResponse> | null = null;
   let providerResult: Result<GptProviderResponse> | null = null;
 
-  // Progress management
   function startProgressSimulation() {
     progressValue = 0;
     progressInterval = setInterval(() => {
@@ -46,15 +44,24 @@
     clearInterval(progressInterval);
   });
 
-  function handleFileSelect(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files?.length) {
-      fileName = input.files[0].name;
+  function handleDocumentFileSelect(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files?.length) {
+      documentFileNames = Array.from(target.files).map((f) => f.name);
     }
   }
 
-  // Common form enhancement function
-  function createFormEnhancer(resultSetter: (result: any) => void, successMessage: string) {
+  function handleOcrFileSelect(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.files?.length) {
+      ocrFileName = target.files[0].name;
+    }
+  }
+
+  function createFormEnhancer(
+    resultSetter: (result: any) => void,
+    successMessage: string
+  ) {
     return () => {
       loading = true;
       startProgressSimulation();
@@ -77,7 +84,7 @@
 <PageContainer title="OpenAI Service Testing">
   <div class="container mx-auto p-4 space-y-6">
     <!-- Service Cards Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Document Analysis Card -->
       <Card class="p-6">
         <h3 class="text-lg font-semibold mb-4">Document Analysis</h3>
@@ -91,24 +98,33 @@
           )}
           class="space-y-4"
         >
-          <div class="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 hover:border-primary/50 transition-colors">
+          <div
+            class="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 hover:border-primary/50 transition-colors"
+          >
             <Upload class="w-8 h-8 text-muted-foreground mb-3" />
             <input
               type="file"
-              name="file"
-              id="file"
+              name="files"
+              id="document-files"
               class="hidden"
-              accept=".pdf,.doc,.docx"
-              on:change={handleFileSelect}
+              accept=".jpg,.jpeg,.png"
+              multiple
+              on:change={handleDocumentFileSelect}
             />
             <label
-              for="file"
+              for="document-files"
               class="text-sm text-muted-foreground cursor-pointer hover:text-foreground text-center"
             >
-              {fileName || "Click to upload or drag and drop"}
+              {documentFileNames.length
+                ? `Selected ${documentFileNames.length} files`
+                : "Click to upload or drag and drop images"}
             </label>
           </div>
-          <Button type="submit" disabled={loading || !fileName} class="w-full">
+          <Button
+            type="submit"
+            disabled={loading || !documentFileNames.length}
+            class="w-full"
+          >
             {loading ? "Analyzing..." : "Analyze Document"}
           </Button>
         </form>
@@ -127,29 +143,37 @@
           )}
           class="space-y-4"
         >
-          <div class="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 hover:border-primary/50 transition-colors">
+          <div
+            class="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 hover:border-primary/50 transition-colors"
+          >
             <Upload class="w-8 h-8 text-muted-foreground mb-3" />
             <input
               type="file"
               name="file"
               id="ocr-file"
               class="hidden"
-              accept=".pdf,.jpg,.jpeg,.png"
-              on:change={handleFileSelect}
+              accept=".jpg,.jpeg,.png"
+              on:change={handleOcrFileSelect}
             />
             <label
               for="ocr-file"
               class="text-sm text-muted-foreground cursor-pointer hover:text-foreground text-center"
             >
-              {fileName || "Click to upload or drag and drop"}
+              {ocrFileName || "Click to upload or drag and drop"}
             </label>
           </div>
-          <Button type="submit" disabled={loading || !fileName} class="w-full">
+          <Button
+            type="submit"
+            disabled={loading || !ocrFileName}
+            class="w-full"
+          >
             {loading ? "Processing..." : "Perform OCR"}
           </Button>
         </form>
       </Card>
+    </div>
 
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <!-- Social Profiling Card -->
       <Card class="p-6">
         <h3 class="text-lg font-semibold mb-4">Social Profiling</h3>
@@ -162,12 +186,12 @@
           )}
           class="space-y-4"
         >
-          <Input 
-            type="text" 
-            name="name" 
-            bind:value={name} 
+          <Input
+            type="text"
+            name="name"
+            bind:value={name}
             placeholder="Enter name to profile"
-            class="w-full" 
+            class="w-full"
           />
           <Button type="submit" disabled={loading || !name} class="w-full">
             {loading ? "Profiling..." : "Generate Social Profile"}
@@ -187,12 +211,12 @@
           )}
           class="space-y-4"
         >
-          <Input 
-            type="text" 
-            name="provider" 
-            bind:value={provider} 
+          <Input
+            type="text"
+            name="provider"
+            bind:value={provider}
             placeholder="Enter provider name"
-            class="w-full" 
+            class="w-full"
           />
           <Button type="submit" disabled={loading || !provider} class="w-full">
             {loading ? "Profiling..." : "Generate Provider Profile"}
@@ -210,42 +234,26 @@
     {#if analysisResult || ocrResult || socialResult || providerResult}
       <Card class="p-6">
         <h3 class="text-lg font-semibold mb-4">Results</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {#if analysisResult}
-            <div class="space-y-2">
-              <h4 class="font-medium">Document Analysis Result:</h4>
-              <pre class="bg-muted p-4 rounded-lg overflow-auto max-h-60">
-                {JSON.stringify(analysisResult, null, 2)}
-              </pre>
-            </div>
-          {/if}
+        <div class="overflow-auto">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {#if analysisResult}
+              <div class="space-y-2">
+                <h4 class="font-medium">Document Analysis Result:</h4>
+                <pre class="bg-muted p-4 rounded-lg overflow-auto max-h-60">
+                  {JSON.stringify(analysisResult, null, 2)}
+                </pre>
+              </div>
+            {/if}
 
-          {#if ocrResult}
-            <div class="space-y-2">
-              <h4 class="font-medium">OCR Result:</h4>
-              <pre class="bg-muted p-4 rounded-lg overflow-auto max-h-60">
-                {JSON.stringify(ocrResult, null, 2)}
-              </pre>
-            </div>
-          {/if}
-
-          {#if socialResult}
-            <div class="space-y-2">
-              <h4 class="font-medium">Social Profile Result:</h4>
-              <pre class="bg-muted p-4 rounded-lg overflow-auto max-h-60">
-                {JSON.stringify(socialResult, null, 2)}
-              </pre>
-            </div>
-          {/if}
-
-          {#if providerResult}
-            <div class="space-y-2">
-              <h4 class="font-medium">Provider Profile Result:</h4>
-              <pre class="bg-muted p-4 rounded-lg overflow-auto max-h-60">
-                {JSON.stringify(providerResult, null, 2)}
-              </pre>
-            </div>
-          {/if}
+            {#if ocrResult}
+              <div class="space-y-2">
+                <h4 class="font-medium">OCR Result:</h4>
+                <pre class="bg-muted p-4 rounded-lg overflow-auto max-h-60">
+                  {JSON.stringify(ocrResult, null, 2)}
+                </pre>
+              </div>
+            {/if}
+          </div>
         </div>
       </Card>
     {/if}

@@ -3,15 +3,20 @@ import { error } from '@sveltejs/kit';
 export const actions = {
     analyze: async ({ request, locals }) => {
         const formData = await request.formData();
-        const file = formData.get('file') as File;
+        const files = formData.getAll('files') as File[];
 
-        if (!file) {
-            throw error(400, 'No file uploaded');
+        if (!files.length) {
+            throw error(400, 'No files uploaded');
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
+        const filesData = await Promise.all(
+            files.map(async file => ({
+                buffer: Buffer.from(await file.arrayBuffer()),
+                name: file.name
+            }))
+        );
 
-        const result = await locals.services.oai.analyzeDocument(buffer, file.name);
+        const result = await locals.services.oai.analyzeDocument(filesData);
 
         return { result };
     },
