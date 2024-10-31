@@ -46,6 +46,9 @@ export const actions = {
 
         const result = await locals.services.oai.performSocialProfiling(name);
 
+        console.log("\n\n\n\n\n\n\n\n\n")
+        console.dir(result, { depth: Infinity })
+        console.log("\n\n\n\n\n\n\n\n\n")
         return { result };
     },
 

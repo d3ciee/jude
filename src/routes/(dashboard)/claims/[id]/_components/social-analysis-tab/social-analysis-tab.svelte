@@ -8,7 +8,7 @@
     import { Separator } from "$lib/ui/separator";
     import { Facebook, Instagram, Linkedin, Twitter } from "lucide-svelte";
 
-    let claim = {
+    let claimD = {
         socialProfile: {
             fullName: "Jane Doe",
             birthDate: "1985-04-23",
@@ -33,6 +33,14 @@
                 "John Doe (brother), Lisa Smith (colleague), Mike Brown (mentor)",
         },
         confidenceLevel: 0.92,
+    };
+
+    const { socialProfile, confidenceLevel }: any = $props();
+    let claim = {
+        confidenceLevel: confidenceLevel
+            ? confidenceLevel
+            : claimD.confidenceLevel,
+        socialProfile: socialProfile ? socialProfile : claimD.socialProfile,
     };
 </script>
 
