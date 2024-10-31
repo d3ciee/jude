@@ -1,5 +1,456 @@
 <script lang="ts">
     import * as Tabs from "$lib/ui/tabs";
+    import { Badge } from "$lib/ui/badge";
+    import { Card, CardContent, CardHeader, CardTitle } from "$lib/ui/card";
+
+    import {
+        Table,
+        TableBody,
+        TableCell,
+        TableHead,
+        TableHeader,
+        TableRow,
+    } from "$lib/ui/table";
+    import {
+        AlertCircle,
+        CheckCircle,
+        Clock,
+        DollarSign,
+        FileText,
+        XCircle,
+    } from "lucide-svelte";
+
+    type GptClaimAnalysisResponse = {
+        memberNumber: string;
+        patientName: string;
+        providerName: string;
+        claimAmount: number;
+        approvedAmount: number;
+        rejectedAmount: number;
+        verdict: "approved" | "partially approved" | "rejected";
+        flags: {
+            type: string;
+            description: string;
+            severity: "low" | "medium" | "high";
+        }[];
+        ruleViolations: {
+            ruleId: string;
+            description: string;
+            impact: "low" | "medium" | "high";
+            suggestedResolution: string;
+        }[];
+        metrics: {
+            processingTime: number;
+            numberOfServices: number;
+            averageServiceCost: number;
+            totalAmountClaimed: number;
+            totalAmountApproved: number;
+            totalAmountRejected: number;
+            supportingDocumentsReviewed: number;
+            missingSupportingDocuments: string[];
+        };
+        adjustments: {
+            adjustmentType: string;
+            description: string;
+            amountAdjusted: number;
+        }[];
+        breakdown: {
+            serviceLine: number;
+            serviceDescription: string;
+            claimedAmount: number;
+            approvedAmount: number;
+            rejectedAmount: number;
+            notes?: string;
+        }[];
+        paymentDetails: {
+            payableAmount: number;
+            reason: string;
+            paymentStatus: "pending" | "processed" | "rejected";
+            expectedPaymentDate: string;
+        };
+        humanInterventionRequired: boolean;
+        summary: string;
+    };
+
+    export let data: GptClaimAnalysisResponse = {
+        memberNumber: "123456789",
+        patientName: "John Doe",
+        providerName: "General Hospital",
+        claimAmount: 5000,
+        approvedAmount: 4500,
+        rejectedAmount: 500,
+        verdict: "partially approved",
+        flags: [
+            {
+                type: "Documentation",
+                description: "Missing lab results",
+                severity: "medium",
+            },
+            {
+                type: "Billing",
+                description: "Possible duplicate charge",
+                severity: "high",
+            },
+        ],
+        ruleViolations: [
+            {
+                ruleId: "R001",
+                description: "Service not covered under current plan",
+                impact: "high",
+                suggestedResolution: "Review patient's coverage details",
+            },
+        ],
+        metrics: {
+            processingTime: 120,
+            numberOfServices: 5,
+            averageServiceCost: 1000,
+            totalAmountClaimed: 5000,
+            totalAmountApproved: 4500,
+            totalAmountRejected: 500,
+            supportingDocumentsReviewed: 3,
+            missingSupportingDocuments: ["Lab Report", "Physician Notes"],
+        },
+        adjustments: [
+            {
+                adjustmentType: "Contractual",
+                description: "Network discount applied",
+                amountAdjusted: 300,
+            },
+            {
+                adjustmentType: "Clinical",
+                description: "Service deemed not medically necessary",
+                amountAdjusted: 200,
+            },
+        ],
+        breakdown: [
+            {
+                serviceLine: 1,
+                serviceDescription: "Office Visit",
+                claimedAmount: 200,
+                approvedAmount: 180,
+                rejectedAmount: 20,
+            },
+            {
+                serviceLine: 2,
+                serviceDescription: "X-Ray",
+                claimedAmount: 800,
+                approvedAmount: 720,
+                rejectedAmount: 80,
+            },
+            {
+                serviceLine: 3,
+                serviceDescription: "Lab Tests",
+                claimedAmount: 4000,
+                approvedAmount: 3600,
+                rejectedAmount: 400,
+            },
+        ],
+        paymentDetails: {
+            payableAmount: 4500,
+            reason: "Partial approval due to coverage limitations",
+            paymentStatus: "pending",
+            expectedPaymentDate: "2023-07-15",
+        },
+        humanInterventionRequired: true,
+        summary:
+            "Claim partially approved. Some services were adjusted or denied due to coverage limitations and missing documentation. Human review recommended for final decision.",
+    };
+
+    function getVerdictColor(verdict: string) {
+        switch (verdict) {
+            case "approved":
+                return "bg-green-100 text-green-800";
+            case "partially approved":
+                return "bg-yellow-100 text-yellow-800";
+            case "rejected":
+                return "bg-red-100 text-red-800";
+            default:
+                return "bg-gray-100 text-gray-800";
+        }
+    }
+
+    function getSeverityColor(severity: string) {
+        switch (severity) {
+            case "low":
+                return "bg-blue-100 text-blue-800";
+            case "medium":
+                return "bg-yellow-100 text-yellow-800";
+            case "high":
+                return "bg-red-100 text-red-800";
+            default:
+                return "bg-gray-100 text-gray-800";
+        }
+    }
 </script>
 
-<Tabs.Content value="descision" class="mt-3">descision</Tabs.Content>
+<Tabs.Content value="descision" class="mt-3">
+    <div class="h-full p-4 space-y-6">
+        <header
+            class="bg-white shadow rounded-lg p-6 flex justify-between items-center"
+        >
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    Claim Analysis Report
+                </h1>
+                <p class="text-gray-600">
+                    Member: {data.memberNumber} | Patient: {data.patientName}
+                </p>
+            </div>
+            <Badge class={`text-lg px-3 py-1 ${getVerdictColor(data.verdict)}`}>
+                {data.verdict.charAt(0).toUpperCase() + data.verdict.slice(1)}
+            </Badge>
+        </header>
+
+        <Card>
+            <CardHeader>
+                <CardTitle>Summary</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <p>{data.summary}</p>
+                {#if data.humanInterventionRequired}
+                    <Badge variant="destructive" class="mt-2"
+                        >Human Intervention Required</Badge
+                    >
+                {/if}
+            </CardContent>
+        </Card>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Card>
+                <CardHeader
+                    class="flex flex-row items-center justify-between space-y-0 pb-2"
+                >
+                    <CardTitle class="text-sm font-medium"
+                        >Total Claimed</CardTitle
+                    >
+                    <DollarSign class="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div class="text-2xl font-bold">
+                        ${data.claimAmount.toFixed(2)}
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader
+                    class="flex flex-row items-center justify-between space-y-0 pb-2"
+                >
+                    <CardTitle class="text-sm font-medium"
+                        >Approved Amount</CardTitle
+                    >
+                    <CheckCircle class="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div class="text-2xl font-bold">
+                        ${data.approvedAmount.toFixed(2)}
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader
+                    class="flex flex-row items-center justify-between space-y-0 pb-2"
+                >
+                    <CardTitle class="text-sm font-medium"
+                        >Rejected Amount</CardTitle
+                    >
+                    <XCircle class="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div class="text-2xl font-bold">
+                        ${data.rejectedAmount.toFixed(2)}
+                    </div>
+                </CardContent>
+            </Card>
+            <Card>
+                <CardHeader
+                    class="flex flex-row items-center justify-between space-y-0 pb-2"
+                >
+                    <CardTitle class="text-sm font-medium"
+                        >Processing Time</CardTitle
+                    >
+                    <Clock class="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div class="text-2xl font-bold">
+                        {data.metrics.processingTime} min
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Flags</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ul class="space-y-2">
+                        {#each data.flags as flag, index}
+                            <li class="flex items-center space-x-2">
+                                <Badge class={getSeverityColor(flag.severity)}
+                                    >{flag.severity}</Badge
+                                >
+                                <span>{flag.type}: {flag.description}</span>
+                            </li>
+                        {/each}
+                    </ul>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Rule Violations</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ul class="space-y-2">
+                        {#each data.ruleViolations as violation, index}
+                            <li class="space-y-1">
+                                <div class="flex items-center space-x-2">
+                                    <Badge
+                                        class={getSeverityColor(
+                                            violation.impact,
+                                        )}>{violation.impact}</Badge
+                                    >
+                                    <span class="font-semibold"
+                                        >{violation.ruleId}: {violation.description}</span
+                                    >
+                                </div>
+                                <p class="text-sm text-gray-600">
+                                    Resolution: {violation.suggestedResolution}
+                                </p>
+                            </li>
+                        {/each}
+                    </ul>
+                </CardContent>
+            </Card>
+        </div>
+
+        <Card>
+            <CardHeader>
+                <CardTitle>Service Breakdown</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>Service Line</TableHead>
+                            <TableHead>Description</TableHead>
+                            <TableHead>Claimed</TableHead>
+                            <TableHead>Approved</TableHead>
+                            <TableHead>Rejected</TableHead>
+                            <TableHead>Notes</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {#each data.breakdown as service}
+                            <TableRow>
+                                <TableCell>{service.serviceLine}</TableCell>
+                                <TableCell
+                                    >{service.serviceDescription}</TableCell
+                                >
+                                <TableCell
+                                    >${service.claimedAmount.toFixed(
+                                        2,
+                                    )}</TableCell
+                                >
+                                <TableCell
+                                    >${service.approvedAmount.toFixed(
+                                        2,
+                                    )}</TableCell
+                                >
+                                <TableCell
+                                    >${service.rejectedAmount.toFixed(
+                                        2,
+                                    )}</TableCell
+                                >
+                                <TableCell>{service.notes || "-"}</TableCell>
+                            </TableRow>
+                        {/each}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Adjustments</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <ul class="space-y-2">
+                        {#each data.adjustments as adjustment, index}
+                            <li class="flex justify-between items-center">
+                                <span
+                                    >{adjustment.adjustmentType}: {adjustment.description}</span
+                                >
+                                <Badge variant="outline"
+                                    >${adjustment.amountAdjusted.toFixed(
+                                        2,
+                                    )}</Badge
+                                >
+                            </li>
+                        {/each}
+                    </ul>
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Payment Details</CardTitle>
+                </CardHeader>
+                <CardContent class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">Payable Amount:</span>
+                        <span
+                            >${data.paymentDetails.payableAmount.toFixed(
+                                2,
+                            )}</span
+                        >
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">Status:</span>
+                        <Badge>{data.paymentDetails.paymentStatus}</Badge>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">Expected Payment Date:</span
+                        >
+                        <span>{data.paymentDetails.expectedPaymentDate}</span>
+                    </div>
+                    <p class="text-sm text-gray-600">
+                        {data.paymentDetails.reason}
+                    </p>
+                </CardContent>
+            </Card>
+        </div>
+
+        <Card>
+            <CardHeader>
+                <CardTitle>Additional Metrics</CardTitle>
+            </CardHeader>
+            <CardContent class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <span>Number of Services:</span>
+                    <span>{data.metrics.numberOfServices}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Average Service Cost:</span>
+                    <span>${data.metrics.averageServiceCost.toFixed(2)}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Supporting Documents Reviewed:</span>
+                    <span>{data.metrics.supportingDocumentsReviewed}</span>
+                </div>
+                <div>
+                    <span class="font-semibold"
+                        >Missing Supporting Documents:</span
+                    >
+                    <ul class="list-disc list-inside">
+                        {#each data.metrics.missingSupportingDocuments as doc}
+                            <li>{doc}</li>
+                        {/each}
+                    </ul>
+                </div>
+            </CardContent>
+        </Card>
+    </div>
+</Tabs.Content>

@@ -45,7 +45,7 @@
 </script>
 
 <PageContainer>
-    <div class="w-full h-full p-6 gap-6 flex flex-col">
+    <div class="w-full h-full p-6 gap-6 flex flex-col overflow-auto">
         <div class="grid gap-1.5">
             <h1
                 class="text-lg font-semibold leading-none tracking-tight space-y-1.5"
