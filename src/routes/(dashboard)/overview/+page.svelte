@@ -28,6 +28,7 @@
 	} from 'chart.js';
     import type { AuditLog, TClaim } from "$lib/server/db/schema";
     import { toast } from "$lib/ui/sonner";
+    import { ScrollArea } from "$lib/ui/scroll-area";
 
     const {data} = $props();
 
@@ -162,15 +163,13 @@
                 {@render KpiCard({title:"Claim denial rate", icon: TriangleAlert, value:"2%", previousValue:"0%"})}
                 {@render KpiCard({title:"User satisfaction score", icon: Star, value:"4.9/5", previousValue:"0/5"})}
             </div>
+            
             <div class="h-[300px] p-4 border rounded">
-                
                     <canvas id="line-chart" class="w-full" bind:this={canvas} ></canvas>
-                  
-                  
               </div>
               
-            <div class="grid gap-4 md:gap-8 lg:grid-cols-2 xl:grid-cols-3">
-                <Card.Root class="xl:col-span-2">
+            <div class="grid gap-4 lg:grid-cols-2 xl:grid-cols-4 ">
+                <Card.Root class="h-[500px] overflow-hidden xl:col-span-2">
                     <Card.Header class="flex flex-row items-center">
                         <div class="grid gap-2">
                             <Card.Title>Claims</Card.Title>
@@ -183,7 +182,8 @@
                             <ArrowUpRight class="h-4 w-4" />
                         </Button>
                     </Card.Header>
-                    <Card.Content>
+                    <Card.Content class="h-full overflow-hidden">
+                        <ScrollArea class="h-full">
                         <Table.Root>
                             <Table.Header>
                                 <Table.Row>
@@ -202,7 +202,9 @@
                                     >
                                 </Table.Row>
                             </Table.Header>
+                            
                             <Table.Body>
+
                                 {#each claims as c}
                                     <Table.Row>
                                         <Table.Cell>
@@ -235,37 +237,40 @@
                                 {/each}
                             </Table.Body>
                         </Table.Root>
+                    </ScrollArea>
                     </Card.Content>
                 </Card.Root>
-                <Card.Root>
+                <Card.Root class="h-[500px] overflow-hidden xl:col-span-2">
                     <Card.Header>
                         <Card.Title>Audit logs</Card.Title>
                     </Card.Header>
-                    <Card.Content class="grid gap-8">
-                        {#each auditLogs as log}
-                        
-                        <div class="flex items-center gap-4">
-                            <Avatar.Root class="hidden h-9 w-9 sm:flex">
-                                <Avatar.Image
-                                    src="/avatars/01.png"
-                                    alt="Avatar"
-                                />
-                                <Avatar.Fallback>{log.user.name[0].toUpperCase()}</Avatar.Fallback>
-                            </Avatar.Root>
-                            <div class="grid gap-1">
-                                <p class="text-sm font-medium leading-none">
-                                    {log.user.name}
-                                </p>
-                                <p class="text-muted-foreground text-sm">
-                                    {log.details}
-                                </p>
+                    <Card.Content class="grid gap-8 h-full">
+                        <ScrollArea>
+                            <div class="h-full grid gap-8">
+                                {#each auditLogs as log}
+                                <div class="flex items-center gap-4">
+                                    <Avatar.Root class="hidden h-9 w-9 sm:flex">
+                                        <Avatar.Image
+                                            src="/avatars/01.png"
+                                            alt="Avatar"
+                                        />
+                                        <Avatar.Fallback>{log.user.name[0].toUpperCase()}</Avatar.Fallback>
+                                    </Avatar.Root>
+                                    <div class="grid gap-1">
+                                        <p class="text-sm font-medium leading-none">
+                                            {log.user.name}
+                                        </p>
+                                        <p class="text-muted-foreground text-sm">
+                                            {log.details}
+                                        </p>
+                                    </div>
+                                    <div class="ml-auto font-medium">
+                                        {new Date(log.createdAt).toLocaleDateString()}
+                                    </div>
+                                </div>
+                                {/each}
                             </div>
-                            <div class="ml-auto font-medium">
-                                {new Date(log.createdAt).toLocaleDateString()}
-                            </div>
-                        </div>
-                        
-                        {/each}
+                        </ScrollArea>
                     </Card.Content>
                 </Card.Root>
             </div>
