@@ -6,10 +6,11 @@
     import { Label } from "$lib/ui/label";
     import * as Select from "$lib/ui/select";
     import genId from "$lib/utils/gen-id";
-    import type { SubmitFunction } from "./$types";
+    
     import { toast } from "$lib/ui/sonner";
     import { invalidateAll } from "$app/navigation";
     import { enhance } from "$app/forms";
+    import type { SubmitFunction } from "../../claims/$types";
 
     let files = $state([{
         type:"",
@@ -59,10 +60,10 @@
         </Dialog.Header>
         <form method="POST" action="/claims?/create" enctype="multipart/form-data" use:enhance={onSubmit}>
             <input type="hidden" name="number-of-files" value={files.length}/>
-            <div class="grid gap-4 py-4">
+            <div class="grid gap-4 py-4 w-full">
                 <div class="grid grid-cols-4 items-center gap-4">
                     <Label for="name" class="text-right">Member ID</Label>
-                    <Input name="membership-number" required class="w-full"/>
+                    <Input name="membership-number" required class="w-full col-span-3"/>
                 </div>  
 
                 <div class="grid grid-cols-4 items-center gap-4">
@@ -91,26 +92,7 @@
                         >
                         <div class="col-span-3 flex items-center gap-2">
                             <Input id="file-{i}" type="file" class="pl-0" name="file-{i}" bind:value={files[i].file}/>
-                            <Select.Root>
-                                <Select.Trigger class="w-[180px]">
-                                    <Select.Value placeholder="File type" />
-                                </Select.Trigger>
-                                <Select.Content>
-                                    <Select.Item value="claim-application"
-                                        >Claim application</Select.Item
-                                    >
-                                    <Select.Item value="invoice"
-                                        >Invoice</Select.Item
-                                    >
-                                    <Select.Item value="prescription"
-                                        >Prescription</Select.Item
-                                    >
-                                </Select.Content>
-                                <Select.Input
-                                    bind:value={files[i].type}
-                                    name="file-{i}-type"
-                                />
-                            </Select.Root>
+
                             <Button
                                 type="button"
                                 variant="ghost"

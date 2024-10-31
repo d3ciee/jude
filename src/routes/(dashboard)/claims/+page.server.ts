@@ -45,8 +45,7 @@ export const actions = {
             return {
                 name: file.name,
                 size: file.size,
-                object: Buffer.from(await file.arrayBuffer()),
-                type: formData.get(`file-${i}-type`)?.toString() || "other",
+                object: Buffer.from(await file.arrayBuffer())
             }
         }));
 

@@ -11,13 +11,13 @@ import bcrypt from "bcryptjs";
 import AuditService from "$lib/server/services/audit";
 import StorageProvider from "$lib/server/providers/storage";
 import EmailProvider from "$lib/server/providers/email";
+import SerpProvider from "$lib/server/providers/serp";
 
 export const handle: Handle = async ({ event, resolve }) => {
 
     const db = init();
     const logger = createLogger({
         level: 'debug',
-
         transports: [
             new transports.Console(),
         ],
@@ -51,6 +51,7 @@ export const handle: Handle = async ({ event, resolve }) => {
         ipAddress: "fake_ip_address"
 
     }
+
     event.locals.db = db;
     event.locals.logger = logger.child({ requestId });
     event.locals.services = {

@@ -114,6 +114,7 @@ class OpenAIService {
         }
     }
 
+
     async performSocialProfiling(name: string) {
         try {
             if (!name) {
@@ -163,7 +164,6 @@ class OpenAIService {
                 //@ts-ignore
                 result.extractedData.avatar = imageResult.data?.images[0]?.imageUrl
             }
-
 
             return { success: true, data: result };
 

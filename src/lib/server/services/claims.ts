@@ -119,7 +119,7 @@ class ClaimsService {
         submittedBy: TClaim["submittedBy"];
         membershipNumber: string;
         submissionChannel: TClaim["submissionChannel"];
-        files: { name: string, size: number, type: string, object: Buffer }[];
+        files: { name: string, size: number, object: Buffer }[];
     }): Promise<Result<{ id: string }>> {
         this.logger.info("creating claim");
         this.logger.debug("input", input);
