@@ -1,5 +1,5 @@
 import { JUDE, OPENAI_API_KEY } from '$env/static/private';
-import type { GptOcrResponse, GptProviderResponse, GptAnalysisResponse, GptResponseType, GptSocialProfilerResponse, GptCostAnalysisResponse } from '$lib/types';
+import type { GptOcrResponse, GptProviderResponse, GptClaimAnalysisResponse, GptResponseType, GptSocialProfilerResponse, GptCostAnalysisResponse } from '$lib/types';
 import { OpenAI, toFile } from 'openai';
 import type winston from 'winston';
 import SerpProvider from '../providers/serp';
@@ -57,7 +57,7 @@ class OpenAIService {
                 assistant_id: this.analysisAssistantId,
             });
 
-            const response = await this.waitForRunCompletion<GptAnalysisResponse>(thread.id, run.id);
+            const response = await this.waitForRunCompletion<GptClaimAnalysisResponse>(thread.id, run.id);
             return response;
 
         } catch (error) {

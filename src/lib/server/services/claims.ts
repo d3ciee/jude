@@ -6,6 +6,7 @@ import StorageProvider from "../providers/storage";
 import AuditService from "./audit";
 import { count } from "drizzle-orm";
 import OpenAIService from "./oai";
+import type { ClaimDoc } from "$lib/types";
 
 class ClaimsService {
     private db: DB;
@@ -151,7 +152,9 @@ class ClaimsService {
 
                         const ocr = await this.oaiService.performOCR(file.object, file.name);
 
-                        patientName = ocr.data.extractedData.patientName! as string;
+                        var claim = ocr.data.extractedData as ClaimDoc
+
+                        patientName = claim.patientName
 
                         if (!ocr.success) throw new Error("ocr failed")
                         return {

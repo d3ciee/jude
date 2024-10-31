@@ -9,43 +9,47 @@ export const OCR_SYSTEM_PROMPT = `
             // Date format: dd/mm/yyyy
             // Currency format: e.g., 1234.56
         },
-        'documentType': 'HospitalClaim|DiagnosticClaim|Prescription|Invoice|Receipt|DoctorsNote|CostBreakdown|Unknown',
+        'documentType': 'Claim|Prescription|Invoice|Receipt|DoctorsNote|CostBreakdown|Unknown',
         'confidenceLevel': 0.0-1.0,
-        'documentCount': 1 // Number of documents detected
     }",
     "specificInstructions": [
         {
-            "HospitalClaim": [
+            "Claim": [
+                "membershipNumber",
                 "memberName",
-                "memberInitials",
-                "memberNumber",
-                "treatmentDate",
                 "patientName",
-                "amountCharged",
-                "tariff",
-                "providerName",
-                "providerAddress",
-                "providerContact",
-                "admissionDate",
-                "dischargeDate",
-                "drugBreakdown"
-            ]
-        },
-        {
-            "DiagnosticClaim": [
-                "memberName",
-                "memberInitials",
-                "memberNumber",
+                "patientRelationship",
+                "patientDateOfBirth",
+                "patientSuffixNo",
+                "postalAddress",
+                "contactNumber",
                 "treatmentDate",
-                "patientName",
-                "amountCharged",
-                "tariff",
+                "claimDate",
+                "claimStatus",
+                "isAccidentRelated",
+                "accidentType",
                 "providerName",
-                "providerAddress",
                 "providerContact",
-                "doctorRequestForm"
+                "referringPractitioner",
+                "services": [
+                    "lineNumber"
+                    "tariffNumber"
+                    "modifiers"
+                    "quantity"
+                    "year"
+                    "month"
+                    "days"
+                    "feeCharged"
+                ],
+                "grossAmountClaimed": 0.0,
+                "diagnosisCode": "",
+                "diagnosisDescription": "",
+                "memberSignature": "",
+                "claimSignatureDate": "",
+                "providerSignatureDate": "",
+                "additionalNotes": "",
             ]
-        },
+        }
         {
             "Prescription": [
                 "memberName",
