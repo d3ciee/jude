@@ -35,6 +35,9 @@ class RulesService {
             const rules = await this.db.query.Rule.findMany({
                 limit: input.limit ?? RulesService.GET_LIST_OF_RULES_DEFAULT_LIMIT,
                 offset: input.offset ?? 0,
+                orderBy(fields, operators) {
+                    return operators.desc(fields.createdAt)
+                },
                 with: {
 
                     createdBy: {

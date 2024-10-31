@@ -35,7 +35,36 @@ export interface CreateRule {
     description: string;
 }
 
-export type GptResponseType = GptAnalysisResponse | GptOcrResponse | GptProviderResponse | GptSocialProfilerResponse;
+export type GptResponseType = GptAnalysisResponse | GptOcrResponse | GptProviderResponse | GptSocialProfilerResponse | GptCostAnalysisResponse;
+
+export type GptCostAnalysisResponse = {
+    costAnalysis: {
+        totalCost: number;
+        breakdown: {
+            consultation: number;
+            medication: number;
+            procedures: number;
+            laboratory: number;
+            other: number;
+        };
+        reasonableness: {
+            score: number;
+            concerns: string[];
+            recommendations: string[];
+        };
+        marketComparison: {
+            percentileRank: number;
+            averageCost: number;
+            variance: number;
+        };
+        flags: {
+            overpriced: boolean;
+            missingItems: boolean;
+            inconsistencies: boolean;
+        };
+    };
+    confidenceLevel: number;
+};
 
 
 

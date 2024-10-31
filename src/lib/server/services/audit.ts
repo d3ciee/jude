@@ -42,6 +42,9 @@ class AuditService {
             const logs = await this.db.query.AuditLog.findMany({
                 limit: input.limit,
                 offset: input.offset,
+                orderBy(fields, operators) {
+                    return operators.desc(fields.createdAt)
+                },
                 with: {
                     user: {
                         columns: {

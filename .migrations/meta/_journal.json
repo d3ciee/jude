@@ -85,6 +85,13 @@
       "when": 1730323042251,
       "tag": "0011_elite_sheva_callister",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1730329239638,
+      "tag": "0012_remarkable_goblin_queen",
+      "breakpoints": true
     }
   ]
 }

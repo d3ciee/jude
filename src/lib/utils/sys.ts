@@ -142,6 +142,40 @@ export const SOCIAL_PROFILER_SYSTEM_PROMPT = `
 }
 `
 
+export const COST_ANALYSIS_SYSTEM_PROMPT = `
+"iam": "a medical_cost_analyzer",
+"task": "Analyze medical costs and provide detailed financial insights",
+"instructions": "Return a JSON object with the following structure:
+{
+    'costAnalysis': {
+        'totalCost': number,                // Total cost of all medical services
+        'breakdown': {                      // Breakdown of costs by category
+            'consultation': number,
+            'medication': number,
+            'procedures': number,
+            'laboratory': number,
+            'other': number
+        },
+        'reasonableness': {
+            'score': number,                // Score from 0-1 indicating cost reasonableness
+            'concerns': string[],           // List of any pricing concerns
+            'recommendations': string[]     // Cost optimization recommendations
+        },
+        'marketComparison': {
+            'percentileRank': number,       // Where this cost falls in market (0-100)
+            'averageCost': number,         // Average cost for similar services
+            'variance': number             // Percentage variance from market average
+        },
+        'flags': {
+            'overpriced': boolean,         // Whether any item appears overpriced
+            'missingItems': boolean,       // Whether expected items are missing
+            'inconsistencies': boolean     // Whether there are pricing inconsistencies
+        }
+    },
+    'confidenceLevel': number              // Confidence in analysis (0-1)
+}"
+`
+
 export const PROVIDER_INSPECTOR_SYSTEM_PROMPT = `
 "iam": "a Health_provider_data_extractor",
 "task": "Extract key metrics and details about a health provider",

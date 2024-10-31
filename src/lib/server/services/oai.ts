@@ -1,9 +1,9 @@
 import { JUDE, OPENAI_API_KEY } from '$env/static/private';
-import type { GptOcrResponse, GptProviderResponse, GptAnalysisResponse, GptResponseType, GptSocialProfilerResponse } from '$lib/types';
+import type { GptOcrResponse, GptProviderResponse, GptAnalysisResponse, GptResponseType, GptSocialProfilerResponse, GptCostAnalysisResponse } from '$lib/types';
 import { OpenAI, toFile } from 'openai';
 import type winston from 'winston';
 import SerpProvider from '../providers/serp';
-import { OCR_SYSTEM_PROMPT, PROVIDER_INSPECTOR_SYSTEM_PROMPT, SOCIAL_PROFILER_SYSTEM_PROMPT } from '$lib/utils/sys';
+import { OCR_SYSTEM_PROMPT, PROVIDER_INSPECTOR_SYSTEM_PROMPT, SOCIAL_PROFILER_SYSTEM_PROMPT, COST_ANALYSIS_SYSTEM_PROMPT } from '$lib/utils/sys';
 
 class OpenAIService {
     private client: OpenAI;
@@ -173,7 +173,55 @@ class OpenAIService {
         }
     }
 
-    async performProviderProfiling(provider: string) {
+    async performCostAnalysis(fileBuffer: Buffer, fileName: string): Promise<Result<GptCostAnalysisResponse>> {
+        try {
+            const fileExt = fileName.split('.').pop()?.toLowerCase();
+
+            if (!fileExt || !['jpg', 'jpeg', 'png'].includes(fileExt)) {
+                throw new Error('Only image files (jpg, jpeg, png) are supported');
+            }
+
+            const base64Image = fileBuffer.toString('base64');
+
+            const response = await this.client.chat.completions.create({
+                model: "gpt-4o",
+                messages: [
+                    {
+                        role: "system",
+                        content: COST_ANALYSIS_SYSTEM_PROMPT
+                    },
+                    {
+                        role: "user",
+                        content: [
+                            {
+                                type: "text",
+                                text: "Please analyze the costs in this medical document."
+                            },
+                            {
+                                type: "image_url",
+                                image_url: {
+                                    url: `data:image/${fileExt};base64,${base64Image}`
+                                }
+                            }
+                        ]
+                    }
+                ],
+                max_tokens: 4096,
+                response_format: {
+                    type: "json_object"
+                }
+            });
+
+            const result = JSON.parse(response.choices[0].message.content || "{}") as GptCostAnalysisResponse;
+            return { success: true, data: result };
+
+        } catch (error) {
+            this.logger.error('Error analyzing costs:', error);
+            throw error;
+        }
+    }
+
+    async performProviderProfiling(provider: string): Promise<Result<GptProviderResponse>> {
         try {
             if (!provider) {
                 throw new Error('provider must not be null');

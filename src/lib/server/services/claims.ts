@@ -41,6 +41,9 @@ class ClaimsService {
             const claims = (await this.db.query.Claim.findMany({
                 limit: input.limit ?? ClaimsService.GET_LIST_OF_CLAIMS_DEFAULT_LIMIT,
                 offset: input.offset ?? 0,
+                orderBy(fields, operators) {
+                    return operators.desc(fields.createdAt)
+                },
                 with: {
                     files: {
 
@@ -181,6 +184,7 @@ class ClaimsService {
                         this.logger.error("error fetching social profile", e)
                     })
             }
+
             if (providerName) {
                 this.oaiService.performSocialProfiling(patientName)
                     .then((r) => {
