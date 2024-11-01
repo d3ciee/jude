@@ -28,6 +28,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             })
         }
 
+        console.log("session", session)
+
         if (session.step == 1) {
             locals.db.update(WhatsappSession).set({ step: 2 }).where(eq(WhatsappSession.id, session.id))
             await locals.providers.whatsapp.send({ msisdn, message: "hello, please send your member number" });
@@ -44,7 +46,9 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
         }
 
-    } catch (e) { }
+    } catch (e) {
+        console.log(e);
+    }
     return new Response();
 }
 
