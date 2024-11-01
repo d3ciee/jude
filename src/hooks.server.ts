@@ -12,6 +12,7 @@ import AuditService from "$lib/server/services/audit";
 import StorageProvider from "$lib/server/providers/storage";
 import EmailProvider from "$lib/server/providers/email";
 import SerpProvider from "$lib/server/providers/serp";
+import WhatsappProvider from "$lib/server/providers/whatsapp";
 
 export const handle: Handle = async ({ event, resolve }) => {
 
@@ -51,6 +52,11 @@ export const handle: Handle = async ({ event, resolve }) => {
         ipAddress: "fake_ip_address"
 
     }
+
+    // const wa = new WhatsappProvider(logger)
+    // wa.send({ message: "Hello, femzy", msisdn: "263777299683" })
+
+
 
     event.locals.db = db;
     event.locals.logger = logger.child({ requestId });
