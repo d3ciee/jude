@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const msisdn = "263777299683"
     let message = ""
     try {
-        console.dir(request.json(), { depth: Infinity });
+        console.dir(await request.json(), { depth: Infinity });
 
         let session: any;
 
@@ -36,6 +36,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             await locals.providers.whatsapp.send({ msisdn, message: "great, now please send your documents, type done when finished" });
         } else if (session.step == 3) {
             //check if the message is of type image and upload to s3
+
+
             if (false) {
 
             }
