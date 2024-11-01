@@ -12,67 +12,14 @@
         TableRow,
     } from "$lib/ui/table";
     import {
-        AlertCircle,
         CheckCircle,
         Clock,
         DollarSign,
-        FileText,
         XCircle,
     } from "lucide-svelte";
+  import type { GptClaimAnalysisResponse } from "$lib/types";
 
-    type GptClaimAnalysisResponse = {
-        memberNumber: string;
-        patientName: string;
-        providerName: string;
-        claimAmount: number;
-        approvedAmount: number;
-        rejectedAmount: number;
-        verdict: "approved" | "partially approved" | "rejected";
-        flags: {
-            type: string;
-            description: string;
-            severity: "low" | "medium" | "high";
-        }[];
-        ruleViolations: {
-            ruleId: string;
-            description: string;
-            impact: "low" | "medium" | "high";
-            suggestedResolution: string;
-        }[];
-        metrics: {
-            processingTime: number;
-            numberOfServices: number;
-            averageServiceCost: number;
-            totalAmountClaimed: number;
-            totalAmountApproved: number;
-            totalAmountRejected: number;
-            supportingDocumentsReviewed: number;
-            missingSupportingDocuments: string[];
-        };
-        adjustments: {
-            adjustmentType: string;
-            description: string;
-            amountAdjusted: number;
-        }[];
-        breakdown: {
-            serviceLine: number;
-            serviceDescription: string;
-            claimedAmount: number;
-            approvedAmount: number;
-            rejectedAmount: number;
-            notes?: string;
-        }[];
-        paymentDetails: {
-            payableAmount: number;
-            reason: string;
-            paymentStatus: "pending" | "processed" | "rejected";
-            expectedPaymentDate: string;
-        };
-        humanInterventionRequired: boolean;
-        summary: string;
-    };
-
-    export let data: GptClaimAnalysisResponse = {
+    export let data: GptClaimAnalysisResponse | undefined = {
         memberNumber: "123456789",
         patientName: "John Doe",
         providerName: "General Hospital",
@@ -197,7 +144,7 @@
                 </p>
             </div>
             <Badge class={`text-lg px-3 py-1 ${getVerdictColor(data.verdict)}`}>
-                {data.verdict.charAt(0).toUpperCase() + data.verdict.slice(1)}
+                {data?.verdict.charAt(0).toUpperCase() + data.verdict.slice(1)}
             </Badge>
         </header>
 

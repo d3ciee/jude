@@ -6,7 +6,8 @@ import StorageProvider from "../providers/storage";
 import AuditService from "./audit";
 import { count, eq } from "drizzle-orm";
 import OpenAIService from "./oai";
-import type { ClaimDoc } from "$lib/types";
+import type { ClaimDoc, GptClaimAnalysisResponse } from "$lib/types";
+import RulesService from "./rules";
 
 class ClaimsService {
     private db: DB;
@@ -18,6 +19,7 @@ class ClaimsService {
     private requestContext: App.RequestContext;
 
     private oaiService: OpenAIService;
+    private rulesService: RulesService;
 
     public static GET_LIST_OF_CLAIMS_DEFAULT_LIMIT = 10;
 
@@ -29,6 +31,7 @@ class ClaimsService {
         this.oaiService = new OpenAIService(logger);
         this.auditService = new AuditService(db, logger);
         this.storageProvider = new StorageProvider(this.logger);
+        this.rulesService = new RulesService(context, db, logger);
     }
 
     async getListOfClaims(input: { limit: number; offset: number }): Promise<Result<{
@@ -79,6 +82,7 @@ class ClaimsService {
 
     async getClaim(id: string): Promise<Result<{
         claim: TClaim & { files: TFile[] };
+        analysis?: GptClaimAnalysisResponse;
     }>> {
         this.logger.info(`fetching claim '${id}' from db`)
 
@@ -98,12 +102,13 @@ class ClaimsService {
                 }
             }
 
-            this.logger.info("claim fetched succesfully", { claims: claim, })
+            this.logger.info("claim fetched succesfully", { claims: claim })
 
             return {
                 success: true,
                 data: {
                     claim,
+                    analysis: claim.analysis
                 }
             }
         } catch (e) {
@@ -175,41 +180,61 @@ class ClaimsService {
 
 
 
-            await Promise.all([
-                this.oaiService.performSocialProfiling(patientName)
-                    .then((r) => {
-                        console.log('\n\n\n\n\n\n\n')
-                        console.dir(r, { depth: Infinity })
-                        console.log('\n\n\n\n\n\n\n')
-                        this.db.update(Claim).
-                            set({
-                                procesingStep: "fetching-social-profile",
-                                socialProfile: r.data.extractedData,
-                                socialProfileConfidence: r.data.confidenceLevel.toString()
-                            }).where(eq(Claim.id, claimId))
-                            .execute()
-                    }).catch((e) => {
-                        this.logger.error("error fetching social profile", e)
-                    }),
+            try {
+                await Promise.all([
+                    this.oaiService.performSocialProfiling(patientName)
+                        .then(async (r) => {
+                            if (r.success) {
+                                await this.db.update(Claim)
+                                    .set({
+                                        procesingStep: "fetching-social-profile",
+                                        socialProfile: r.data.extractedData,
+                                        socialProfileConfidence: r.data.confidenceLevel.toString()
+                                    })
+                                    .where(eq(Claim.id, claimId))
+                                    .execute();
+                            }
+                        }).catch((e) => {
+                            this.logger.error("error fetching social profile", e)
+                        }),
 
-                this.oaiService.performProviderProfiling(providerName)
-                    .then((r) => {
-                        console.log('\n\n\n\n\n\n\n')
-                        console.dir(r, { depth: Infinity })
-                        console.log('\n\n\n\n\n\n\n')
+                    this.oaiService.performProviderProfiling(providerName)
+                        .then(async (r) => {
+                            if (r.success) {
+                                await this.db.update(Claim)
+                                    .set({
+                                        procesingStep: "fetching-provider-profile",
+                                        providerProfile: r.data.extractedData,
+                                        providerProfileConfidence: r.data.confidenceLevel.toString()
+                                    })
+                                    .where(eq(Claim.id, claimId))
+                                    .execute();
+                            }
+                        }).catch((e) => {
+                            this.logger.error("error fetching provider profile", e)
+                        }),
 
-                        if (!r.success) throw Error(`error fetching provider profile: ${r.error}`)
-                        this.db.update(Claim)
-                            .set({
-                                procesingStep: "fetching-provider-profile",
-                                providerProfile: r.data.extractedData,
-                                providerProfileConfidence: r.data.confidenceLevel.toString()
-                            }).where(eq(Claim.id, claimId))
-                            .execute()
-                    }).catch((e) => {
-                        this.logger.error("error fetching social profile", e)
+                    (async () => {
+                        const files = input.files.map(file => ({
+                            buffer: file.object,
+                            name: file.name
+                        }));
+                        const rulesResult = await this.rulesService.getListOfRules({ limit: 100, offset: 0 });
+                        const activeRules = rulesResult.success ? rulesResult.data.rules.filter(r => r.active) : [];
+                        const analysis = await this.oaiService.analyzeDocument(files, activeRules);
+                        if (analysis.success) {
+                            await this.db.update(Claim)
+                                .set({ analysis: analysis.data })
+                                .where(eq(Claim.id, claimId))
+                                .execute();
+                        }
+                    })().catch((e) => {
+                        this.logger.error("error analyzing documents", e)
                     })
-            ])
+                ]);
+            } catch (e) {
+                this.logger.error("error processing claim analyses", e);
+            }
 
 
 

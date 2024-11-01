@@ -62,6 +62,8 @@ const Claim = sqliteTable("claim", {
     costAnalysis: text("cost_analysis", { mode: "json" }),
     costAnalysisConfidence: text("cost_analysis_confidence"),
 
+    analysis: text("analysis", { mode: "json" }),
+
     metadata: text("metadata", { mode: "json" })
 })
 type TClaim = typeof Claim.$inferSelect

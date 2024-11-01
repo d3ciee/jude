@@ -1,9 +1,10 @@
 import { JUDE, OPENAI_API_KEY } from '$env/static/private';
-import type { GptOcrResponse, GptProviderResponse, GptClaimAnalysisResponse, GptResponseType, GptSocialProfilerResponse, GptCostAnalysisResponse } from '$lib/types';
+import type { GptOcrResponse, GptProviderResponse, GptClaimAnalysisResponse, GptResponseType, GptSocialProfilerResponse, GptCostAnalysisResponse, Rule } from '$lib/types';
 import { OpenAI, toFile } from 'openai';
 import type winston from 'winston';
 import SerpProvider from '../providers/serp';
 import { OCR_SYSTEM_PROMPT, PROVIDER_INSPECTOR_SYSTEM_PROMPT, SOCIAL_PROFILER_SYSTEM_PROMPT, COST_ANALYSIS_SYSTEM_PROMPT } from '$lib/utils/sys';
+import type { ImageFileContentBlock, MessageContentPartParam, TextContentBlockParam } from 'openai/resources/beta/threads/messages.mjs';
 
 class OpenAIService {
     private client: OpenAI;
@@ -20,9 +21,8 @@ class OpenAIService {
         this.analysisAssistantId = JUDE;
     }
 
-    async analyzeDocument(files: Array<{ buffer: Buffer; name: string }>) {
+    async analyzeDocument(files: Array<{ buffer: Buffer; name: string }>, rules?: Rule[]) {
         try {
-
             if (!files.length) {
                 throw new Error('At least one file must be provided');
             }
@@ -34,22 +34,30 @@ class OpenAIService {
                 }
                 return this.client.files.create({
                     file: await toFile(buffer, name),
-                    purpose: 'vision',
+                    purpose: 'assistants',
                 });
             }));
 
             const thread = await this.client.beta.threads.create();
 
+            const content: (MessageContentPartParam | ImageFileContentBlock)[] = [
+                ...uploadedFiles.map(file => ({
+                    type: 'image_file',
+                    image_file: {
+                        file_id: file.id,
+                        detail: 'auto'
+                    }
+                } as ImageFileContentBlock)),
+
+                ...(rules?.map(rule => ({
+                    type: 'text',
+                    text: rule.description
+                } as MessageContentPartParam)) ?? [])
+            ];
 
             await this.client.beta.threads.messages.create(thread.id, {
                 role: 'user',
-                content: uploadedFiles.map(c => ({
-                    type: 'image_file' as const,
-                    image_file: {
-                        file_id: c.id,
-                        detail: 'auto'
-                    }
-                })),
+                content: content,
                 attachments: [],
             });
 
@@ -58,6 +66,7 @@ class OpenAIService {
             });
 
             const response = await this.waitForRunCompletion<GptClaimAnalysisResponse>(thread.id, run.id);
+
             return response;
 
         } catch (error) {
