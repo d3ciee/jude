@@ -57,7 +57,7 @@ const Claim = sqliteTable("claim", {
     id: text("id").notNull().primaryKey(),
     createdAt: integer("created_at").notNull(),
     status: text("stage", { enum: ["pending", "approved", "rejected"] }).notNull(),
-    procesingStep: text("processing_step", { enum: ["pending", "parsing-files", "fetching-social-profile", "fetching-provider-profile"] }).notNull(),
+    procesingStep: text("processing_step", { enum: ["pending", "parsing-files", "fetching-social-profile", "fetching-provider-profile", "cost-analysis"] }).notNull(),
     submittedBy: text("submitted_by", { enum: ["member", "provider"] }).notNull(),
     submissionChannel: text("submission_channel", { enum: ["portal", "email", "app"] }).notNull(),
     membershipNumber: text("membership_number").notNull(),
@@ -67,6 +67,8 @@ const Claim = sqliteTable("claim", {
 
     providerProfile: text("provider_profile", { mode: "json" }),
     providerProfileConfidence: text("provider_profile_confidence"),
+
+
 
     costAnalysis: text("cost_analysis", { mode: "json" }),
     costAnalysisConfidence: text("cost_analysis_confidence"),

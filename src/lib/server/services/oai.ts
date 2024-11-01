@@ -21,7 +21,7 @@ class OpenAIService {
         this.analysisAssistantId = JUDE;
     }
 
-    async analyzeDocument(files: Array<{ buffer: Buffer; name: string }>, rules?: Rule[]) {
+    async analyzeDocument(files: Array<{ buffer: Buffer; name: string }>) {
         try {
             if (!files.length) {
                 throw new Error('At least one file must be provided');
@@ -40,24 +40,30 @@ class OpenAIService {
 
             const thread = await this.client.beta.threads.create();
 
-            const content: (MessageContentPartParam | ImageFileContentBlock)[] = [
-                ...uploadedFiles.map(file => ({
-                    type: 'image_file',
-                    image_file: {
-                        file_id: file.id,
-                        detail: 'auto'
-                    }
-                } as ImageFileContentBlock)),
+            // const content: (MessageContentPartParam | ImageFileContentBlock)[] = [
+            //     ...uploadedFiles.map(file => ({
+            //         type: 'image_file',
+            //         image_file: {
+            //             file_id: file.id,
+            //             detail: 'auto'
+            //         }
+            //     } as ImageFileContentBlock)),
 
-                ...(rules?.map(rule => ({
-                    type: 'text',
-                    text: rule.description
-                } as MessageContentPartParam)) ?? [])
-            ];
+            //     ...(rules?.map(rule => ({
+            //         type: 'text',
+            //         text: rule.description
+            //     } as MessageContentPartParam)) ?? [])
+            // ];
 
             await this.client.beta.threads.messages.create(thread.id, {
                 role: 'user',
-                content: content,
+                content: uploadedFiles.map(c => ({
+                    type: 'image_file',
+                    image_file: {
+                        file_id: c.id,
+                        detail: 'auto'
+                    }
+                })),
                 attachments: [],
             });
 

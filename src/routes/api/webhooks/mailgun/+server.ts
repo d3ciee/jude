@@ -35,6 +35,13 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         return new Response();
     }
 
+
+    await locals.providers.email.sendEmail({
+        to: email,
+        subject: "Claim Submission Successful",
+        text: `Your claim has been submitted successfully.  For more information, or to track your claims progress, contact us or go to https://jude-gold.vercel.app/member/${membershipNumber}`,
+    })
+
     const result = await locals.services.claims.createClaim({
         submittedBy,
         submissionChannel: 'email',
@@ -51,13 +58,6 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
         return new Response();
     }
-
-    await locals.providers.email.sendEmail({
-        to: email,
-        subject: "Claim Submission Successful",
-        text: `Your claim has been submitted successfully.  For more information, or to track your claims progress, contact us or go to https://jude-gold.vercel.app/member/${membershipNumber}`,
-    })
-
 
     return new Response();
 };

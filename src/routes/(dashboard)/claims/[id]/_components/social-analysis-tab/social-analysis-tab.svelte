@@ -40,7 +40,9 @@
         confidenceLevel: confidenceLevel
             ? confidenceLevel
             : claimD.confidenceLevel,
-        socialProfile: socialProfile ? socialProfile : claimD.socialProfile,
+        socialProfile: socialProfile
+            ? { ...claimD.socialProfile, ...socialProfile }
+            : claimD.socialProfile,
     };
 </script>
 

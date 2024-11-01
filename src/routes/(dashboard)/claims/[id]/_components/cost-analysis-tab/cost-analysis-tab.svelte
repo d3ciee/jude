@@ -10,20 +10,20 @@
     import AlertCircle from "lucide-svelte/icons/circle-alert";
     import { Activity, FileText } from "lucide-svelte";
 
-    const defaultTotalCost = 1250.0;
+    const defaultTotalCost = 1125;
     const defaultBreakdown = {
-        consultation: 200.0,
-        medication: 450.0,
-        procedures: 350.0,
-        laboratory: 200.0,
-        other: 50.0,
+        consultation: 0,
+        medication: 0,
+        procedures: 998.59,
+        laboratory: 780.6,
+        other: 178.78,
     };
 
-    const defaultReasonablenessScore = 0.85;
+    const defaultReasonablenessScore = 0.7;
     const defaultMarketComparison = {
-        percentileRank: 75,
-        averageCost: 1100.0,
-        variance: 13.6,
+        percentileRank: 70,
+        averageCost: 1050,
+        variance: 7.14,
     };
 
     const defaultFlags = {

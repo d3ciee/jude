@@ -11,96 +11,69 @@
         TableHeader,
         TableRow,
     } from "$lib/ui/table";
-    import {
-        CheckCircle,
-        Clock,
-        DollarSign,
-        XCircle,
-    } from "lucide-svelte";
-  import type { GptClaimAnalysisResponse } from "$lib/types";
+    import { CheckCircle, Clock, DollarSign, XCircle } from "lucide-svelte";
+    import type { GptClaimAnalysisResponse } from "$lib/types";
 
-    export let data: GptClaimAnalysisResponse | undefined = {
-        memberNumber: "123456789",
-        patientName: "John Doe",
-        providerName: "General Hospital",
-        claimAmount: 5000,
-        approvedAmount: 4500,
+    const dataD = {
+        memberNumber: "X0123456789",
+        patientName: "Doe, John",
+        providerName: "XYZ Insurance Company",
+        claimAmount: 500,
+        approvedAmount: 0,
         rejectedAmount: 500,
-        verdict: "partially approved",
+        verdict: "rejected",
         flags: [
             {
-                type: "Documentation",
-                description: "Missing lab results",
-                severity: "medium",
-            },
-            {
-                type: "Billing",
-                description: "Possible duplicate charge",
+                type: "ruleViolation",
+                description: "Missing required provider signature",
                 severity: "high",
             },
         ],
         ruleViolations: [
             {
                 ruleId: "R001",
-                description: "Service not covered under current plan",
+                description: "Provider signature missing",
                 impact: "high",
-                suggestedResolution: "Review patient's coverage details",
+                suggestedResolution: "Obtain signature from provider",
             },
         ],
         metrics: {
-            processingTime: 120,
-            numberOfServices: 5,
-            averageServiceCost: 1000,
-            totalAmountClaimed: 5000,
-            totalAmountApproved: 4500,
+            processingTime: 5,
+            numberOfServices: 1,
+            averageServiceCost: 500,
+            totalAmountClaimed: 500,
+            totalAmountApproved: 0,
             totalAmountRejected: 500,
-            supportingDocumentsReviewed: 3,
-            missingSupportingDocuments: ["Lab Report", "Physician Notes"],
+            supportingDocumentsReviewed: 0,
+            missingSupportingDocuments: ["provider signature"],
         },
-        adjustments: [
-            {
-                adjustmentType: "Contractual",
-                description: "Network discount applied",
-                amountAdjusted: 300,
-            },
-            {
-                adjustmentType: "Clinical",
-                description: "Service deemed not medically necessary",
-                amountAdjusted: 200,
-            },
-        ],
+        adjustments: [],
         breakdown: [
             {
                 serviceLine: 1,
-                serviceDescription: "Office Visit",
-                claimedAmount: 200,
-                approvedAmount: 180,
-                rejectedAmount: 20,
-            },
-            {
-                serviceLine: 2,
-                serviceDescription: "X-Ray",
-                claimedAmount: 800,
-                approvedAmount: 720,
-                rejectedAmount: 80,
-            },
-            {
-                serviceLine: 3,
-                serviceDescription: "Lab Tests",
-                claimedAmount: 4000,
-                approvedAmount: 3600,
-                rejectedAmount: 400,
+                serviceDescription: "General medical service",
+                claimedAmount: 500,
+                approvedAmount: 0,
+                rejectedAmount: 500,
+                notes: "Claim rejected due to missing provider signature",
             },
         ],
         paymentDetails: {
-            payableAmount: 4500,
-            reason: "Partial approval due to coverage limitations",
-            paymentStatus: "pending",
-            expectedPaymentDate: "2023-07-15",
+            payableAmount: 0,
+            reason: "Claim rejected due to missing provider signature",
+            paymentStatus: "rejected",
+            expectedPaymentDate: "",
         },
         humanInterventionRequired: true,
         summary:
-            "Claim partially approved. Some services were adjusted or denied due to coverage limitations and missing documentation. Human review recommended for final decision.",
+            "The claim submitted by John Doe for services provided by XYZ Insurance Company was rejected due to a missing provider signature, which is a critical requirement for claim processing. No supporting documents were reviewed as the claim was not processed further. It is recommended to obtain the necessary signature from the provider and resubmit the claim for processing.",
+    };
+
+    let { analysis }: any = $props();
+
+    const data = {
+        ...dataD,
+        ...analysis,
     };
 
     function getVerdictColor(verdict: string) {

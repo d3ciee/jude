@@ -108,7 +108,7 @@ class ClaimsService {
                 success: true,
                 data: {
                     claim,
-                    analysis: claim.analysis
+                    //analysis: claim.analysis
                 }
             }
         } catch (e) {
@@ -132,7 +132,10 @@ class ClaimsService {
 
         const claimId = genId();
         let patientName = "";
-        let providerName = "";
+        let providerName = "Mater dei";
+
+        let file1: Buffer = new Buffer("");
+        let fileName: string = "";
 
 
         try {
@@ -160,6 +163,8 @@ class ClaimsService {
                         var claim = ocr.data.extractedData as ClaimDoc
 
                         patientName = claim.patientName
+                        file1 = file.object
+                        fileName = file.name
 
                         if (!ocr.success) throw new Error("ocr failed")
                         return {
@@ -214,14 +219,30 @@ class ClaimsService {
                             this.logger.error("error fetching provider profile", e)
                         }),
 
+                    this.oaiService.performCostAnalysis(file1, fileName)
+                        .then(async (r) => {
+                            if (r.success) {
+                                await this.db.update(Claim)
+                                    .set({
+                                        procesingStep: "cost-analysis",
+                                        costAnalysis: r.data.costAnalysis,
+                                        costAnalysisConfidence: r.data.confidenceLevel.toString()
+                                    })
+                                    .where(eq(Claim.id, claimId))
+                                    .execute();
+                            }
+                        }).catch((e) => {
+                            this.logger.error("error fetching provider profile", e)
+                        }),
+
                     (async () => {
                         const files = input.files.map(file => ({
                             buffer: file.object,
                             name: file.name
                         }));
-                        const rulesResult = await this.rulesService.getListOfRules({ limit: 100, offset: 0 });
-                        const activeRules = rulesResult.success ? rulesResult.data.rules.filter(r => r.active) : [];
-                        const analysis = await this.oaiService.analyzeDocument(files, activeRules);
+                        // const rulesResult = await this.rulesService.getListOfRules({ limit: 100, offset: 0 });
+                        // const activeRules = rulesResult.success ? rulesResult.data.rules.filter(r => r.active) : [];
+                        const analysis = await this.oaiService.analyzeDocument(files);
                         if (analysis.success) {
                             await this.db.update(Claim)
                                 .set({ analysis: analysis.data })

@@ -41,7 +41,6 @@
         }
         //@ts-ignore
         claim = data.props.data.claim;
-        
     });
 </script>
 
@@ -83,7 +82,11 @@
                         providerProfile={claim.providerProfile}
                         providerProfileConfidence={claim.providerProfileConfidence}
                     />
-                    <DescisionTab data={data.props.success && data.props.data.analysis ? data.props.data.analysis : undefined} />
+                    <DescisionTab
+                        analysis={data.props.success && data.props.data.analysis
+                            ? data.props.data.analysis
+                            : undefined}
+                    />
                 </Tabs.Root>
             {/if}
         </div>
