@@ -14,7 +14,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         }
 
         const message = body.entry[0].changes[0].value.messages[0];
-        const msisdn = message.from;
+        const msisdn = "263777299683";
 
         let session = await locals.db.query.WhatsappSession.findFirst({
             where: ({ msisdn }, { eq }) => {
