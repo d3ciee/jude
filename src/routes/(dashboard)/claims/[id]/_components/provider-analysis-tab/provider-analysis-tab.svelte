@@ -24,7 +24,7 @@
     import * as Card from "$lib/ui/card";
     import { Progress } from "$lib/ui/progress";
 
-    let claim = {
+    let claimD = $state({
         providerProfile: {
             providerName: "City Health Clinic",
             numberOfReviews: 123,
@@ -57,6 +57,17 @@
             ],
         },
         providerProfileConfidence: 0.92,
+    });
+
+    const { providerProfile, providerProfileConfidence } = $props();
+
+    const claim = {
+        providerProfile: providerProfile
+            ? providerProfile
+            : claimD.providerProfile,
+        providerProfileConfidence: providerProfileConfidence
+            ? providerProfileConfidence
+            : claimD.providerProfileConfidence,
     };
 </script>
 

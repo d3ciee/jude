@@ -4,7 +4,7 @@ import { Claim, File, type TClaim, type TFile } from "../db/schema";
 import genId from "$lib/utils/gen-id";
 import StorageProvider from "../providers/storage";
 import AuditService from "./audit";
-import { count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import OpenAIService from "./oai";
 import type { ClaimDoc } from "$lib/types";
 
@@ -174,33 +174,45 @@ class ClaimsService {
             await this.db.update(Claim).set({ procesingStep: "parsing-files" })
 
 
-            if (patientName) {
+
+            await Promise.all([
                 this.oaiService.performSocialProfiling(patientName)
                     .then((r) => {
+                        console.log('\n\n\n\n\n\n\n')
+                        console.dir(r, { depth: Infinity })
+                        console.log('\n\n\n\n\n\n\n')
                         this.db.update(Claim).
                             set({
                                 procesingStep: "fetching-social-profile",
                                 socialProfile: r.data.extractedData,
                                 socialProfileConfidence: r.data.confidenceLevel.toString()
-                            })
+                            }).where(eq(Claim.id, claimId))
+                            .execute()
                     }).catch((e) => {
                         this.logger.error("error fetching social profile", e)
-                    })
-            }
+                    }),
 
-            if (providerName) {
-                this.oaiService.performSocialProfiling(patientName)
+                this.oaiService.performProviderProfiling(providerName)
                     .then((r) => {
+                        console.log('\n\n\n\n\n\n\n')
+                        console.dir(r, { depth: Infinity })
+                        console.log('\n\n\n\n\n\n\n')
+
+                        if (!r.success) throw Error(`error fetching provider profile: ${r.error}`)
                         this.db.update(Claim)
                             .set({
                                 procesingStep: "fetching-provider-profile",
                                 providerProfile: r.data.extractedData,
                                 providerProfileConfidence: r.data.confidenceLevel.toString()
-                            })
+                            }).where(eq(Claim.id, claimId))
+                            .execute()
                     }).catch((e) => {
                         this.logger.error("error fetching social profile", e)
                     })
-            }
+            ])
+
+
+
 
             await this.auditService.log({
                 userId: this.requestContext.userId,

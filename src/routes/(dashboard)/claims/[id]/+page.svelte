@@ -78,7 +78,10 @@
                     <FilesTab files={claim.files} />
                     <CostAnalysisTab />
                     <SocialAnalysisTab socialProfile={claim.socialProfile} />
-                    <ProviderAnalysisTab />
+                    <ProviderAnalysisTab
+                        providerProfile={claim.providerProfile}
+                        providerProfileConfidence={claim.providerProfileConfidence}
+                    />
                     <DescisionTab />
                 </Tabs.Root>
             {/if}

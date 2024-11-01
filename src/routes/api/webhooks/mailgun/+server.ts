@@ -26,6 +26,15 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         }
     }));
 
+    if (!files.length) {
+        await locals.providers.email.sendEmail({
+            to: email,
+            subject: "Claim Submission Failed",
+            text: `Please attach the required files to submit a claim.  For more information, contact us or go to https://jude-gold.vercel.app/member/${membershipNumber}`,
+        })
+        return new Response();
+    }
+
     const result = await locals.services.claims.createClaim({
         submittedBy,
         submissionChannel: 'email',
@@ -39,6 +48,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             subject: "Claim Submission Failed",
             text: `There was an error submitting your claim. Please try again later.  For more information, contact us or go to https://jude-gold.vercel.app/member/${membershipNumber}`,
         })
+
+        return new Response();
     }
 
     await locals.providers.email.sendEmail({
