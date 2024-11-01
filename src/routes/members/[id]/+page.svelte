@@ -22,23 +22,53 @@
 </script>
 
 <PageContainer>
-    <div class="w-full h-full p-8 space-y-8">
+    <div class="container mx-auto max-w-7xl p-4 md:p-8 space-y-8">
         {#if member}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Sidebar with Member Profile and Alerts -->
                 <aside class="space-y-8">
                     <!-- Member Profile Card -->
-                    <Card.Root>
-                        <Card.Header>
-                            <Card.Title>Member Profile</Card.Title>
-                            <Card.Description>
-                                Membership Number: {member.membershipNumber}
-                            </Card.Description>
+                    <Card.Root class="bg-card">
+                        <Card.Header class="pb-4">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center"
+                                >
+                                    <span
+                                        class="text-2xl font-semibold text-primary"
+                                        >{member.name[0]}</span
+                                    >
+                                </div>
+                                <div>
+                                    <Card.Title class="text-xl"
+                                        >{member.name}</Card.Title
+                                    >
+                                    <Card.Description>
+                                        Member #{member.membershipNumber}
+                                    </Card.Description>
+                                </div>
+                            </div>
                         </Card.Header>
                         <Card.Content>
-                            <div class="space-y-2">
-                                <p><strong>Name:</strong> {member.name}</p>
-                                <p><strong>Email:</strong> {member.email}</p>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        class="text-muted-foreground"
+                                        ><path
+                                            d="M22 20v-7.826a4 4 0 0 0-1.253-2.908l-7.373-6.968a2 2 0 0 0-2.748 0L3.253 9.266A4 4 0 0 0 2 12.174V20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2Z"
+                                        /></svg
+                                    >
+                                    <span class="text-sm">{member.email}</span>
+                                </div>
                             </div>
                         </Card.Content>
                     </Card.Root>
@@ -67,13 +97,17 @@
                     <!-- Claims Header -->
                     <header class="flex items-center justify-between">
                         <h2 class="text-2xl font-semibold">Your Claims</h2>
-                        <Button variant="primary" size="sm">New Claim</Button>
+                        <Button variant="default" size="sm">New Claim</Button>
                     </header>
 
                     <!-- Claims Grid Layout -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
+                    >
                         {#each member.claims as claim}
-                            <Card.Root>
+                            <Card.Root
+                                class="hover:shadow-md transition-shadow"
+                            >
                                 <Card.Header
                                     class="flex items-center justify-between pb-2"
                                 >
@@ -109,12 +143,15 @@
                                         <!-- Progress Bar -->
                                         <div class="space-y-2">
                                             <div
-                                                class="flex justify-between text-sm"
+                                                class="flex justify-between text-sm text-muted-foreground"
                                             >
                                                 <span>Progress</span>
                                                 <span>{claim.progress}%</span>
                                             </div>
-                                            <Progress value={claim.progress} />
+                                            <Progress
+                                                value={claim.progress}
+                                                class="h-2"
+                                            />
                                         </div>
 
                                         <!-- Actions -->

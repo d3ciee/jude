@@ -30,7 +30,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         await locals.providers.email.sendEmail({
             to: email,
             subject: "Claim Submission Failed",
-            text: `Please attach the required files to submit a claim.  For more information, contact us or go to https://jude-gold.vercel.app/member/${membershipNumber}`,
+            text: `Please attach the required files to submit a claim.  For more information, contact us or go to https://jude-gold.vercel.app/members/${membershipNumber}`,
         })
         return new Response();
     }
@@ -39,7 +39,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     await locals.providers.email.sendEmail({
         to: email,
         subject: "Claim Submission Successful",
-        text: `Your claim has been submitted successfully.  For more information, or to track your claims progress, contact us or go to https://jude-gold.vercel.app/member/${membershipNumber}`,
+        text: `Your claim has been submitted successfully.  For more information, or to track your claims progress, contact us or go to https://jude-gold.vercel.app/members/${membershipNumber}`,
     })
 
     const result = await locals.services.claims.createClaim({
@@ -53,7 +53,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
         const x = await locals.providers.email.sendEmail({
             to: email,
             subject: "Claim Submission Failed",
-            text: `There was an error submitting your claim. Please try again later.  For more information, contact us or go to https://jude-gold.vercel.app/member/${membershipNumber}`,
+            text: `There was an error submitting your claim. Please try again later.  For more information, contact us or go to https://jude-gold.vercel.app/members/${membershipNumber}`,
         })
 
         return new Response();
