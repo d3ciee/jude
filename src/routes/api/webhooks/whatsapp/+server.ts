@@ -4,15 +4,19 @@ import { eq } from 'drizzle-orm';
 import type { RequestHandler } from './$types';
 
 export const POST: RequestHandler = async ({ request, locals }) => {
-
-    const msisdn = "263777299683"
-    let message = ""
     try {
-        console.dir(await request.json(), { depth: Infinity });
+        const body = await request.json();
+        console.dir(body, { depth: Infinity });
 
-        let session: any;
+        // Check if this is a message from a user (not from our system)
+        if (!body.entry?.[0]?.changes?.[0]?.value?.messages?.[0]) {
+            return new Response();
+        }
 
-        session = await locals.db.query.WhatsappSession.findFirst({
+        const message = body.entry[0].changes[0].value.messages[0];
+        const msisdn = message.from;
+
+        let session = await locals.db.query.WhatsappSession.findFirst({
             where: ({ msisdn }, { eq }) => {
                 return eq(msisdn, msisdn)
             }
@@ -38,12 +42,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
             await locals.providers.whatsapp.send({ msisdn, message: "great, now please send your documents, type done when finished" });
         } else if (session.step == 3) {
             //check if the message is of type image and upload to s3
-
-
             if (false) {
-
             }
-
         }
 
     } catch (e) {
@@ -53,35 +53,8 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 }
 
 export const GET: RequestHandler = async ({ request, locals, url }) => {
-
     const verifyToken = url.searchParams.get('hub.verify_token') || "";
     const challenge = url.searchParams.get('hub.challenge') || "";
 
     return new Response(challenge);
 }
-
-
-
-
-// if (message == "hie") {
-//     await locals.providers.whatsapp.send({ msisdn, message: "hello, how can i help you today?" });
-// } else if message.contains() {
-
-
-
-// const WhatsappSession = sqliteTable("whatsapp_session", {
-//     id: text("id").notNull().primaryKey(),
-//     createdAt: integer("created_at").notNull(),
-//     expiresAt: integer("expires_at").notNull(),
-//     userId: text("user_id").notNull().references(() => User.id),
-//     msisdn: text("msisdn").notNull(),
-//     step: integer("step").default(0),
-//     provider: text("provider").notNull(),
-//     status: text("status", { enum: ["active", "inactive"] }).notNull(),
-//     metadata: text("metadata", { mode: "json" })
-// })
-
-
-// }
-
-
