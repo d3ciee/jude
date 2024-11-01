@@ -68,7 +68,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
     event.locals.providers = {
         storage: new StorageProvider(event.locals.logger),
-        email: new EmailProvider(event.locals.logger)
+        email: new EmailProvider(event.locals.logger),
+        whatsapp: new WhatsappProvider(event.locals.logger)
     }
 
     return await resolve(event);

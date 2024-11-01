@@ -31,6 +31,7 @@ declare global {
 			providers: {
 				storage: import("$lib/server/providers/storage").default;
 				email: import("$lib/server/providers/email").default;
+				whatsapp: import("$lib/server/providers/whatsapp").default;
 			}
 		}
 	}
