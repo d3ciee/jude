@@ -12,6 +12,7 @@ import AuditService from "$lib/server/services/audit";
 import StorageProvider from "$lib/server/providers/storage";
 import EmailProvider from "$lib/server/providers/email";
 import SerpProvider from "$lib/server/providers/serp";
+import WhatsappProvider from "$lib/server/providers/whatsapp";
 
 export const handle: Handle = async ({ event, resolve }) => {
 
@@ -52,6 +53,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     }
 
+    // const wa = new WhatsappProvider(logger)
+    // wa.send({ message: "Testing from CIMAS HACKATHON", msisdn: "263777299683" })
+
+
+
     event.locals.db = db;
     event.locals.logger = logger.child({ requestId });
     event.locals.services = {
@@ -62,7 +68,8 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
     event.locals.providers = {
         storage: new StorageProvider(event.locals.logger),
-        email: new EmailProvider(event.locals.logger)
+        email: new EmailProvider(event.locals.logger),
+        whatsapp: new WhatsappProvider(event.locals.logger)
     }
 
     return await resolve(event);

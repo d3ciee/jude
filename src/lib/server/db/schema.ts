@@ -44,6 +44,15 @@ const rulesRelations = relations(Rule, ({ one }) => ({
     })
 }))
 
+const WhatsappSession = sqliteTable("whatsapp_session", {
+    id: text("id").notNull().primaryKey(),
+    createdAt: integer("created_at").notNull(),
+    msisdn: text("msisdn").notNull(),
+    step: integer("step").default(0),
+    status: text("status", { enum: ["active", "inactive"] }).notNull(),
+    memberNumber: text("member_number"),
+})
+
 const Claim = sqliteTable("claim", {
     id: text("id").notNull().primaryKey(),
     createdAt: integer("created_at").notNull(),
@@ -119,6 +128,7 @@ export {
     Claim,
     File,
     AuditLog,
+    WhatsappSession,
     rulesRelations,
     auditLogRelations,
     sessionRelations,
