@@ -54,7 +54,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
 
     // const wa = new WhatsappProvider(logger)
-    // wa.send({ message: "Hello, femzy", msisdn: "263777299683" })
+    // wa.send({ message: "Testing from CIMAS HACKATHON", msisdn: "263777299683" })
 
 
 
